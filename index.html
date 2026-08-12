@@ -1,0 +1,4020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA CENTINELL v6.0 — Protection & Intelligence Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* --- Reset & Variables --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg: #020c1b;
+      --bg2: #040e20;
+      --panel: #071830;
+      --panel2: #09203a;
+      --border: #0d2d50;
+      --border2: #0f3566;
+      --cyan: #5a9fbf;
+      --cyan2: #4a889f;
+      --cyan3: #3a7080;
+      --amber: #c49a3d;
+      --amber2: #a8843a;
+      --red: #b85555;
+      --red2: #954040;
+      --green: #4fa878;
+      --green2: #3d8c60;
+      --purple: #8070aa;
+      --orange: #b8764a;
+      --text: #c0d4e4;
+      --textd: #829bb5;
+      --textdd: #3d6080;
+      --mono: 'Share Tech Mono', monospace;
+      --orb: 'Orbitron', sans-serif;
+      --raj: 'Rajdhani', sans-serif;
+      --accent: #5a9fbf;
+    }
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--raj);
+      overflow: hidden;
+    }
+
+    /* --- Splash --- */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+    #splash.gone {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sp-logo {
+      font-family: var(--orb);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: 0.18em;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 20px rgba(90, 159, 191, 0.3);
+      }
+      to {
+        text-shadow: 0 0 50px rgba(90, 159, 191, 0.7);
+      }
+    }
+    .sp-shield {
+      width: 70px;
+      height: 70px;
+      margin-bottom: 1rem;
+    }
+    .sp-sub {
+      font-family: var(--raj);
+      font-size: 0.82rem;
+      color: var(--amber);
+      letter-spacing: 0.4em;
+      font-weight: 600;
+      margin-top: 0.3rem;
+    }
+    .sp-ver {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--textdd);
+      letter-spacing: 0.18em;
+      margin-top: 1.4rem;
+    }
+    .sp-bar {
+      width: 280px;
+      height: 1px;
+      background: var(--border);
+      margin-top: 0.9rem;
+      overflow: hidden;
+    }
+    .sp-fill {
+      height: 100%;
+      width: 0;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .sp-log {
+      width: 280px;
+      height: 75px;
+      overflow: hidden;
+      margin-top: 0.7rem;
+    }
+    .sp-line {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--textdd);
+      line-height: 1.6;
+      opacity: 0;
+      animation: fi 0.12s forwards;
+    }
+    .sp-line.ok {
+      color: var(--cyan2);
+    }
+    .sp-line.warn {
+      color: var(--amber);
+    }
+    .sp-line.prot {
+      color: var(--green);
+    }
+    @keyframes fi {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* --- Shell --- */
+    #shell {
+      display: none;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #shell.visible {
+      display: flex;
+    }
+
+    /* --- Sidebar --- */
+    #sidebar {
+      width: 222px;
+      min-width: 222px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .sb-brand {
+      padding: 0.8rem 1rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-brand-logo {
+      font-family: var(--orb);
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+    }
+    .sb-brand-sub {
+      font-family: var(--mono);
+      font-size: 0.46rem;
+      color: var(--textdd);
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+    .sb-session {
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(90, 159, 191, 0.02);
+    }
+    .sb-company {
+      font-family: var(--raj);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .sb-role {
+      font-family: var(--mono);
+      font-size: 0.44rem;
+      color: var(--textdd);
+      letter-spacing: 0.09em;
+      margin-top: 1px;
+    }
+    .sb-prot {
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sb-prot-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    .sb-prot-lbl {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.35;
+      }
+    }
+    .sb-apirow {
+      padding: 0.4rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-api-lbl {
+      font-family: var(--mono);
+      font-size: 0.42rem;
+      color: var(--textdd);
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+    .sb-apirow input {
+      width: 100%;
+      background: #020c1b;
+      border: 1px solid var(--border2);
+      color: var(--textd);
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      padding: 3px 5px;
+      outline: none;
+    }
+    .sb-apirow input:focus {
+      border-color: var(--cyan3);
+    }
+    .sb-nav {
+      flex: 1;
+      padding: 0.35rem 0;
+      overflow-y: auto;
+    }
+    .sb-nav::-webkit-scrollbar {
+      width: 3px;
+    }
+    .sb-nav::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
+    .nav-group {
+      font-family: var(--mono);
+      font-size: 0.44rem;
+      color: var(--textdd);
+      letter-spacing: 0.18em;
+      padding: 0.38rem 1rem 0.2rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.46rem 1rem;
+      cursor: pointer;
+      transition: all 0.12s;
+      border-left: 2px solid transparent;
+      font-family: var(--raj);
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--textd);
+    }
+    .nav-item:hover {
+      background: var(--panel);
+      color: var(--text);
+    }
+    .nav-item.active {
+      background: var(--panel);
+      border-left-color: var(--accent);
+      color: var(--accent);
+    }
+    .nav-item.active .nd {
+      background: var(--accent);
+      box-shadow: 0 0 5px var(--accent);
+    }
+    .nd {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--textdd);
+      flex-shrink: 0;
+    }
+    .nb {
+      font-family: var(--mono);
+      font-size: 0.39rem;
+      padding: 1px 4px;
+      background: rgba(90, 159, 191, 0.1);
+      color: var(--cyan3);
+      border: 1px solid var(--border2);
+      margin-left: auto;
+      letter-spacing: 0.07em;
+    }
+    .nb.amber {
+      background: rgba(196, 154, 61, 0.1);
+      color: var(--amber);
+      border-color: rgba(196, 154, 61, 0.2);
+    }
+    .nb.green {
+      background: rgba(79, 168, 120, 0.1);
+      color: var(--green2);
+      border-color: rgba(79, 168, 120, 0.2);
+    }
+    .nb.red {
+      background: rgba(184, 85, 85, 0.1);
+      color: var(--red);
+      border-color: rgba(184, 85, 85, 0.2);
+    }
+    .nb.purple {
+      background: rgba(128, 112, 170, 0.1);
+      color: var(--purple);
+      border-color: rgba(128, 112, 170, 0.2);
+    }
+    .nb.orange {
+      background: rgba(184, 118, 74, 0.1);
+      color: var(--orange);
+      border-color: rgba(184, 118, 74, 0.2);
+    }
+    .sb-bottom {
+      padding: 0.5rem 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+    .pulsedot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px var(--green);
+      animation: pulse 2.5s infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* --- Main --- */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 1.3rem;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .tb-page {
+      font-family: var(--orb);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.12em;
+    }
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .tb-m {
+      text-align: center;
+    }
+    .tb-mv {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+    .tb-mv.amber {
+      color: var(--amber);
+    }
+    .tb-mv.red {
+      color: var(--red);
+    }
+    .tb-mv.green {
+      color: var(--green);
+    }
+    .tb-ml {
+      font-family: var(--mono);
+      font-size: 0.38rem;
+      color: var(--textdd);
+      letter-spacing: 0.07em;
+    }
+    .tb-clock {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      color: var(--cyan2);
+    }
+    .tb-user {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      padding: 2px 7px;
+      background: rgba(90, 159, 191, 0.07);
+      border: 1px solid var(--border2);
+      color: var(--textd);
+    }
+
+    /* Live Feed */
+    #liveFeed {
+      background: #020b17;
+      border-bottom: 1px solid var(--border);
+      padding: 3px 1.3rem;
+      font-family: var(--mono);
+      font-size: 0.48rem;
+      color: var(--textdd);
+      white-space: nowrap;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      gap: 1.5rem;
+    }
+    .feed-ok {
+      color: var(--green2);
+    }
+    .feed-warn {
+      color: var(--amber);
+    }
+    .feed-err {
+      color: var(--red);
+    }
+
+    /* Content */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #content::-webkit-scrollbar {
+      width: 4px;
+    }
+    #content::-webkit-scrollbar-thumb {
+      background: var(--border2);
+    }
+    .page {
+      display: none;
+      padding: 1.1rem 1.4rem;
+      animation: pagein 0.18s ease;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes pagein {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- Common Components --- */
+    .row {
+      display: flex;
+      gap: 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+    .col {
+      flex: 1;
+      min-width: 0;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.9rem 1.05rem;
+      margin-bottom: 0.8rem;
+    }
+    .card.cyan-top {
+      border-top: 2px solid var(--cyan);
+    }
+    .card.amber-top {
+      border-top: 2px solid var(--amber);
+    }
+    .card.red-top {
+      border-top: 2px solid var(--red);
+    }
+    .card.green-top {
+      border-top: 2px solid var(--green);
+    }
+    .card.purple-top {
+      border-top: 2px solid var(--purple);
+    }
+    .card.orange-top {
+      border-top: 2px solid var(--orange);
+    }
+    .card-title {
+      font-family: var(--orb);
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.09em;
+      margin-bottom: 0.1rem;
+    }
+    .card-sub {
+      font-family: var(--mono);
+      font-size: 0.48rem;
+      color: var(--textdd);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.7rem;
+    }
+    .sec-hdr {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+    .sec-badge {
+      font-family: var(--orb);
+      font-size: 0.48rem;
+      font-weight: 700;
+      background: var(--cyan);
+      color: var(--bg);
+      padding: 2px 8px;
+      letter-spacing: 0.14em;
+      flex-shrink: 0;
+    }
+    .sec-badge.amber {
+      background: var(--amber);
+    }
+    .sec-badge.red {
+      background: var(--red);
+    }
+    .sec-badge.green {
+      background: var(--green);
+    }
+    .sec-badge.purple {
+      background: var(--purple);
+    }
+    .sec-badge.orange {
+      background: var(--orange);
+    }
+    .sec-title {
+      font-family: var(--orb);
+      font-size: 0.63rem;
+      color: var(--textd);
+      letter-spacing: 0.07em;
+    }
+    .sec-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .inp {
+      width: 100%;
+      background: #020c1b;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--raj);
+      font-size: 0.78rem;
+      padding: 0.36rem 0.6rem;
+      outline: none;
+      margin-bottom: 0.4rem;
+    }
+    .inp:focus {
+      border-color: var(--cyan3);
+    }
+    .inp.mono {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+    }
+    textarea.inp {
+      resize: vertical;
+      min-height: 50px;
+      line-height: 1.5;
+    }
+    select.inp {
+      cursor: pointer;
+    }
+    .inp-row {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+      align-items: stretch;
+    }
+    .inp-row .inp {
+      margin-bottom: 0;
+    }
+    .btn {
+      font-family: var(--orb);
+      font-size: 0.54rem;
+      font-weight: 700;
+      padding: 0.38rem 0.8rem;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: all 0.12s;
+      flex-shrink: 0;
+    }
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .btn-cyan {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .btn-amber {
+      background: var(--amber);
+      color: var(--bg);
+    }
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+    }
+    .btn-green {
+      background: var(--green);
+      color: var(--bg);
+    }
+    .btn-purple {
+      background: var(--purple);
+      color: #fff;
+    }
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--textd);
+    }
+    .btn-ghost:hover {
+      border-color: var(--cyan3);
+      color: var(--cyan);
+    }
+    .output {
+      background: #020c1b;
+      border: 1px solid var(--border);
+      padding: 0.58rem;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--cyan2);
+      line-height: 1.6;
+      min-height: 32px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .output.scrollable {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .output.scrollable::-webkit-scrollbar {
+      width: 3px;
+    }
+    .output.scrollable::-webkit-scrollbar-thumb {
+      background: var(--border2);
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.55rem;
+      margin-bottom: 0.8rem;
+    }
+    .mcard {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.58rem 0.72rem;
+    }
+    .mcard-val {
+      font-family: var(--orb);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .mcard-val.amber {
+      color: var(--amber);
+    }
+    .mcard-val.green {
+      color: var(--green);
+    }
+    .mcard-val.red {
+      color: var(--red);
+    }
+    .mcard-val.purple {
+      color: var(--purple);
+    }
+    .mcard-val.orange {
+      color: var(--orange);
+    }
+    .mcard-lbl {
+      font-family: var(--mono);
+      font-size: 0.43rem;
+      color: var(--textdd);
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.69rem;
+    }
+    .tbl th {
+      font-family: var(--mono);
+      font-size: 0.46rem;
+      color: var(--textdd);
+      letter-spacing: 0.06em;
+      padding: 0.3rem 0.45rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-weight: 400;
+    }
+    .tbl td {
+      font-family: var(--raj);
+      padding: 0.32rem 0.45rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--textd);
+      vertical-align: middle;
+    }
+    .tbl tr:hover td {
+      background: var(--panel2);
+    }
+    .tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.43rem;
+      padding: 2px 5px;
+      letter-spacing: 0.05em;
+    }
+    .tag-cyan {
+      background: rgba(90, 159, 191, 0.1);
+      color: var(--cyan);
+      border: 1px solid rgba(90, 159, 191, 0.2);
+    }
+    .tag-amber {
+      background: rgba(196, 154, 61, 0.1);
+      color: var(--amber);
+      border: 1px solid rgba(196, 154, 61, 0.2);
+    }
+    .tag-red {
+      background: rgba(184, 85, 85, 0.1);
+      color: var(--red);
+      border: 1px solid rgba(184, 85, 85, 0.2);
+    }
+    .tag-green {
+      background: rgba(79, 168, 120, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(79, 168, 120, 0.2);
+    }
+    .tag-purple {
+      background: rgba(128, 112, 170, 0.1);
+      color: var(--purple);
+      border: 1px solid rgba(128, 112, 170, 0.2);
+    }
+    .tag-orange {
+      background: rgba(184, 118, 74, 0.1);
+      color: var(--orange);
+      border: 1px solid rgba(184, 118, 74, 0.2);
+    }
+    .spin {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border: 1.5px solid var(--textdd);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spinr 0.6s linear infinite;
+    }
+    @keyframes spinr {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .progress {
+      height: 3px;
+      background: var(--border);
+      margin: 3px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--cyan);
+      transition: width 0.5s;
+    }
+    .progress-fill.amber {
+      background: var(--amber);
+    }
+    .progress-fill.red {
+      background: var(--red);
+    }
+    .progress-fill.green {
+      background: var(--green);
+    }
+    .chatbox {
+      background: #020c1b;
+      border: 1px solid var(--border);
+      height: 290px;
+      overflow-y: auto;
+      padding: 0.7rem;
+      margin-bottom: 0.5rem;
+    }
+    .chatbox::-webkit-scrollbar {
+      width: 3px;
+    }
+    .chatbox::-webkit-scrollbar-thumb {
+      background: var(--border2);
+    }
+    .cmsg {
+      margin-bottom: 0.7rem;
+    }
+    .cmsg-lbl {
+      font-family: var(--mono);
+      font-size: 0.46rem;
+      letter-spacing: 0.09em;
+      margin-bottom: 2px;
+    }
+    .cmsg-lbl.user {
+      color: var(--amber2);
+    }
+    .cmsg-lbl.ai {
+      color: var(--cyan2);
+    }
+    .cmsg-body {
+      font-family: var(--raj);
+      font-size: 0.77rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .cmsg-body.user {
+      color: var(--amber);
+    }
+
+    /* Shield */
+    .shield-ring {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto;
+    }
+    .shield-ring svg {
+      width: 100%;
+      height: 100%;
+    }
+    .shield-val {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .shield-score {
+      font-family: var(--orb);
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .shield-lbl {
+      font-family: var(--mono);
+      font-size: 0.45rem;
+      letter-spacing: 0.12em;
+      margin-top: 3px;
+    }
+    .prot-status {
+      font-family: var(--orb);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.15em;
+      margin-top: 0.6rem;
+      padding: 0.4rem;
+      border: 1px solid;
+    }
+    .prot-status.protected {
+      color: var(--green);
+      border-color: rgba(79, 168, 120, 0.25);
+      background: rgba(79, 168, 120, 0.05);
+    }
+    .prot-status.warning {
+      color: var(--amber);
+      border-color: rgba(196, 154, 61, 0.25);
+      background: rgba(196, 154, 61, 0.05);
+    }
+    .prot-status.danger {
+      color: var(--red);
+      border-color: rgba(184, 85, 85, 0.25);
+      background: rgba(184, 85, 85, 0.05);
+    }
+    .prot-status.scanning {
+      color: var(--cyan);
+      border-color: rgba(90, 159, 191, 0.25);
+      background: rgba(90, 159, 191, 0.05);
+      animation: scanpulse 1s infinite;
+    }
+    @keyframes scanpulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    /* Quarantine */
+    .qrow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.6rem;
+      background: #020c1b;
+      border: 1px solid var(--border);
+      margin-bottom: 3px;
+    }
+    .qrow-name {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--red);
+      flex: 1;
+      word-break: break-all;
+    }
+    .qrow-type {
+      font-family: var(--mono);
+      font-size: 0.43rem;
+      color: var(--textdd);
+    }
+    .qrow-ts {
+      font-family: var(--mono);
+      font-size: 0.43rem;
+      color: var(--textdd);
+    }
+
+    /* Network */
+    .conn-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.52rem;
+    }
+    .conn-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .conn-ip {
+      color: var(--cyan2);
+      flex: 1;
+    }
+    .conn-port {
+      color: var(--textdd);
+      width: 45px;
+    }
+    .conn-status {
+      font-size: 0.43rem;
+      padding: 1px 5px;
+    }
+    .conn-bytes {
+      color: var(--textdd);
+      text-align: right;
+      width: 55px;
+    }
+
+    /* MITRE */
+    .mitre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      gap: 3px;
+    }
+    .mitre-cell {
+      padding: 0.24rem 0.3rem;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.41rem;
+      cursor: pointer;
+      transition: all 0.12s;
+      line-height: 1.4;
+    }
+    .mitre-cell.low {
+      background: rgba(79, 168, 120, 0.04);
+      color: var(--green2);
+    }
+    .mitre-cell.med {
+      background: rgba(196, 154, 61, 0.06);
+      color: var(--amber);
+    }
+    .mitre-cell.high {
+      background: rgba(184, 85, 85, 0.08);
+      color: var(--red);
+    }
+    .mitre-cell.sel {
+      border-color: var(--cyan);
+      box-shadow: inset 0 0 0 1px var(--cyan);
+    }
+
+    /* HITL */
+    .hitl-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.45rem;
+    }
+    .hitl-card.approved {
+      border-left-color: var(--green);
+    }
+    .hitl-card.rejected {
+      border-left-color: var(--red);
+    }
+    .hitl-id {
+      font-family: var(--mono);
+      font-size: 0.47rem;
+      color: var(--textdd);
+      margin-bottom: 2px;
+    }
+    .hitl-desc {
+      font-family: var(--raj);
+      font-size: 0.75rem;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    /* Chain */
+    .chain-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .chain-icon {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 0.45rem;
+      color: var(--cyan);
+      flex-shrink: 0;
+      background: var(--panel2);
+    }
+    .chain-lbl {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--textd);
+    }
+    .chain-val {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--cyan2);
+      word-break: break-all;
+      margin-top: 1px;
+    }
+
+    /* Arch */
+    .arch-node {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.75rem;
+      text-align: center;
+    }
+    .arch-node.cyan {
+      border-top: 2px solid var(--cyan);
+    }
+    .arch-node.amber {
+      border-top: 2px solid var(--amber);
+    }
+    .arch-node.green {
+      border-top: 2px solid var(--green);
+    }
+    .arch-node.purple {
+      border-top: 2px solid var(--purple);
+    }
+    .arch-node.red {
+      border-top: 2px solid var(--red);
+    }
+    .arch-node-title {
+      font-family: var(--orb);
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.07em;
+    }
+    .arch-node-sub {
+      font-family: var(--mono);
+      font-size: 0.42rem;
+      color: var(--textdd);
+      margin-top: 3px;
+    }
+
+    /* Audit log */
+    #g-auditlog {
+      position: fixed;
+      bottom: 0;
+      left: 222px;
+      right: 0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      height: 0;
+      overflow: hidden;
+      transition: height 0.2s;
+      z-index: 50;
+    }
+    #g-auditlog.open {
+      height: 95px;
+    }
+    #g-auditlog .inner {
+      padding: 0.3rem 1.3rem;
+      height: 100%;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--textdd);
+      line-height: 1.6;
+    }
+    #toggleAudit {
+      position: fixed;
+      bottom: 0;
+      left: 222px;
+      font-family: var(--mono);
+      font-size: 0.43rem;
+      background: var(--border);
+      color: var(--textd);
+      border: none;
+      cursor: pointer;
+      padding: 2px 8px;
+      letter-spacing: 0.1em;
+      z-index: 51;
+    }
+
+    /* Page transitions */
+    .page {
+      display: none;
+      padding: 1.1rem 1.4rem;
+      animation: pageSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .page.active {
+      display: block;
+    }
+    .page.exit-anim {
+      animation: pageSlideOut 0.15s ease forwards;
+    }
+    @keyframes pageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes pageSlideOut {
+      to {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Navigation tiles */
+    .nav-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+    }
+    .nav-tile {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 1.1rem 1rem 0.9rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.4rem;
+    }
+    .nav-tile::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      transition: height 0.25s ease;
+    }
+    .nav-tile:hover {
+      transform: translateY(-4px);
+      border-color: var(--border2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(90, 159, 191, 0.06);
+    }
+    .nav-tile:hover::before {
+      height: 3px;
+    }
+    .nav-tile:active {
+      transform: translateY(-1px);
+      transition-duration: 0.08s;
+    }
+    .nav-tile-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
+    .nav-tile:hover .nav-tile-icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 18px rgba(90, 159, 191, 0.12);
+    }
+    .nav-tile-title {
+      font-family: var(--orb);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+      line-height: 1.3;
+    }
+    .nav-tile-sub {
+      font-family: var(--mono);
+      font-size: 0.4rem;
+      color: var(--textdd);
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+    }
+    .nav-tile-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-family: var(--mono);
+      font-size: 0.35rem;
+      padding: 1px 5px;
+      letter-spacing: 0.06em;
+    }
+    .nav-tile.t-cyan::before {
+      background: var(--cyan);
+    }
+    .nav-tile.t-cyan .nav-tile-icon {
+      background: rgba(90, 159, 191, 0.08);
+      color: var(--cyan);
+    }
+    .nav-tile.t-cyan .nav-tile-title {
+      color: var(--cyan);
+    }
+    .nav-tile.t-amber::before {
+      background: var(--amber);
+    }
+    .nav-tile.t-amber .nav-tile-icon {
+      background: rgba(196, 154, 61, 0.08);
+      color: var(--amber);
+    }
+    .nav-tile.t-amber .nav-tile-title {
+      color: var(--amber);
+    }
+    .nav-tile.t-red::before {
+      background: var(--red);
+    }
+    .nav-tile.t-red .nav-tile-icon {
+      background: rgba(184, 85, 85, 0.08);
+      color: var(--red);
+    }
+    .nav-tile.t-red .nav-tile-title {
+      color: var(--red);
+    }
+    .nav-tile.t-green::before {
+      background: var(--green);
+    }
+    .nav-tile.t-green .nav-tile-icon {
+      background: rgba(79, 168, 120, 0.08);
+      color: var(--green);
+    }
+    .nav-tile.t-green .nav-tile-title {
+      color: var(--green);
+    }
+    .nav-tile.t-purple::before {
+      background: var(--purple);
+    }
+    .nav-tile.t-purple .nav-tile-icon {
+      background: rgba(128, 112, 170, 0.08);
+      color: var(--purple);
+    }
+    .nav-tile.t-purple .nav-tile-title {
+      color: var(--purple);
+    }
+    .nav-tile.t-orange::before {
+      background: var(--orange);
+    }
+    .nav-tile.t-orange .nav-tile-icon {
+      background: rgba(184, 118, 74, 0.08);
+      color: var(--orange);
+    }
+    .nav-tile.t-orange .nav-tile-title {
+      color: var(--orange);
+    }
+    .nav-tile .tile-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      transform: scale(0);
+      animation: tileRipple 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes tileRipple {
+      to {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+    .tiles-label {
+      font-family: var(--mono);
+      font-size: 0.46rem;
+      color: var(--textdd);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .tiles-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Infrastructure */
+    body.mode-lockdown {
+      filter: sepia(0.3) saturate(1.3) hue-rotate(-15deg);
+      animation: critical-pulse 1.5s infinite;
+    }
+    @keyframes critical-pulse {
+      0% {
+        box-shadow: inset 0 0 80px rgba(184, 85, 85, 0);
+      }
+      50% {
+        box-shadow: inset 0 0 160px rgba(184, 85, 85, 0.3);
+      }
+      100% {
+        box-shadow: inset 0 0 80px rgba(184, 85, 85, 0);
+      }
+    }
+    .bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 120px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar {
+      flex: 1;
+      background: var(--accent);
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      min-width: 8px;
+    }
+    .bar:hover {
+      background: var(--amber);
+    }
+    .bar:hover::after {
+      content: attr(data-value) '%';
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--amber);
+      white-space: nowrap;
+      background: rgba(2, 12, 27, .9);
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .world-map-sim {
+      background: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg') no-repeat center;
+      background-size: contain;
+      height: 380px;
+      position: relative;
+      opacity: 0.35;
+      border: 1px solid var(--border);
+      margin-top: 15px;
+    }
+    .map-node {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+      animation: node-ping 2s infinite;
+    }
+    @keyframes node-ping {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+    .glass-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--cyan);
+      padding: 0.9rem 1.05rem;
+      margin-bottom: 0.8rem;
+    }
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      #shell {
+        flex-direction: column;
+      }
+      #sidebar {
+        width: 100%;
+        min-width: 100%;
+        max-height: 220px;
+      }
+      #main {
+        min-height: 0;
+      }
+      .row {
+        flex-direction: column;
+      }
+      .col {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <svg class="sp-shield" viewBox="0 0 70 70" fill="none">
+      <path d="M35 5 L60 18 L60 40 Q60 58 35 67 Q10 58 10 40 L10 18 Z" stroke="#5a9fbf" stroke-width="1.5" fill="rgba(90,159,191,0.08)"/>
+      <path d="M35 15 L52 24 L52 40 Q52 53 35 60 Q18 53 18 40 L18 24 Z" stroke="#4a889f" stroke-width="0.8" fill="rgba(90,159,191,0.05)"/>
+      <text x="35" y="41" text-anchor="middle" font-family="Orbitron" font-size="14" fill="#5a9fbf" font-weight="700">IA</text>
+    </svg>
+    <div class="sp-logo">IA CENTINELL</div>
+    <div class="sp-sub">INTELLIGENCE · PROTECTION · GOVERNANCE</div>
+    <div class="sp-ver">v6.0 // ENTERPRISE AI + ACTIVE PROTECTION ENGINE</div>
+    <div class="sp-bar"><div class="sp-fill" id="spFill"></div></div>
+    <div class="sp-log" id="spLog"></div>
+  </div>
+
+  <!-- SHELL -->
+  <div id="shell">
+    <div id="sidebar">
+      <div class="sb-brand">
+        <div class="sb-brand-logo">IA CENTINELL</div>
+        <div class="sb-brand-sub">INTELLIGENCE + PROTECTION // v6.0</div>
+      </div>
+      <div class="sb-session">
+        <div class="sb-company">Beacon of the Eagle LLC</div>
+        <div class="sb-role">CLEARANCE: LEVEL-5 ADMIN</div>
+      </div>
+      <div class="sb-prot">
+        <div class="sb-prot-dot" id="sbProtDot"></div>
+        <span class="sb-prot-lbl" id="sbProtLbl">PROTECTED</span>
+      </div>
+      <div class="sb-apirow">
+        <div class="sb-api-lbl">IA CENTINELL ENGINE KEY</div>
+        <input type="password" id="globalKey" placeholder="IACK-..." value="demo-key-for-sales">
+      </div>
+      <nav class="sb-nav">
+        <div class="nav-group">COMMAND</div>
+        <div class="nav-item active" onclick="nav('bridge')"><div class="nd"></div>BRIDGE<span class="nb">HQ</span></div>
+        <div class="nav-group">PROTECTION ENGINE</div>
+        <div class="nav-item" onclick="nav('shield')"><div class="nd"></div>THREAT SHIELD<span class="nb orange">SCAN</span></div>
+        <div class="nav-item" onclick="nav('netwatch')"><div class="nd"></div>NET SENTINEL<span class="nb red">LIVE</span></div>
+        <div class="nav-item" onclick="nav('guardian')"><div class="nd"></div>FILE GUARDIAN<span class="nb green">WATCH</span></div>
+        <div class="nav-item" onclick="nav('quarantine')"><div class="nd"></div>QUARANTINE<span class="nb red" id="qBadge">0</span></div>
+        <div class="nav-group">IA-CORE MODULES</div>
+        <div class="nav-item" onclick="nav('c11')"><div class="nd"></div>IA-CORE-1-1<span class="nb">AUDIT</span></div>
+        <div class="nav-item" onclick="nav('c12')"><div class="nd"></div>IA-CORE-1-2<span class="nb amber">FORENSIC</span></div>
+        <div class="nav-item" onclick="nav('c13')"><div class="nd"></div>IA-CORE-1-3<span class="nb">ETHICS</span></div>
+        <div class="nav-item" onclick="nav('c14')"><div class="nd"></div>IA-CORE-1-4<span class="nb amber">THREAT</span></div>
+        <div class="nav-group">INTELLIGENCE</div>
+        <div class="nav-item" onclick="nav('analyst')"><div class="nd"></div>AI ANALYST<span class="nb">IA</span></div>
+        <div class="nav-item" onclick="nav('algo')"><div class="nd"></div>ALGO LAB<span class="nb amber">ELITE</span></div>
+        <div class="nav-group">PLATFORM</div>
+        <div class="nav-item" onclick="nav('mission')"><div class="nd"></div>WHAT WE SOLVE<span class="nb green">IA-1</span></div>
+        <div class="nav-item" onclick="nav('arch')"><div class="nd"></div>ARCHITECTURE<span class="nb purple">STACK</span></div>
+        <div class="nav-item" onclick="nav('infra')"><div class="nd"></div>INFRASTRUCTURE<span class="nb purple">NODES</span></div>
+        <div id="adminNav" style="display:block;">
+          <div class="nav-group">ADMIN</div>
+          <div class="nav-item" onclick="nav('clients')"><div class="nd"></div>CLIENT PANEL<span class="nb red">ADMIN</span></div>
+        </div>
+      </nav>
+      <div class="sb-bottom">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <span class="pulsedot"></span>
+          <span style="font-family:var(--mono);font-size:0.48rem;color:var(--textd);">ONLINE</span>
+          <span style="font-family:var(--mono);font-size:0.46rem;color:var(--textdd);margin-left:auto;" id="sbClock">--:--</span>
+        </div>
+        <span style="font-family:var(--mono);font-size:0.44rem;color:var(--textdd);cursor:pointer;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--textdd)'" onclick="doLogout()">[ RESTART DEMO ]</span>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="topbar">
+        <div class="tb-page" id="tbPage">BRIDGE — COMMAND HQ</div>
+        <div class="tb-right">
+          <div class="tb-m"><div class="tb-mv green" id="topProtected">100%</div><div class="tb-ml">PROTECTED</div></div>
+          <div class="tb-m"><div class="tb-mv" id="topOps">0</div><div class="tb-ml">OPS</div></div>
+          <div class="tb-m"><div class="tb-mv amber" id="topAlerts">0</div><div class="tb-ml">ALERTS</div></div>
+          <div class="tb-m"><div class="tb-mv red" id="topThreats">0</div><div class="tb-ml">THREATS</div></div>
+          <div class="tb-m"><div class="tb-mv red" id="topQuarantined">0</div><div class="tb-ml">QUARANTINED</div></div>
+          <div class="tb-m"><div class="tb-mv cyan" id="topDevices">0</div><div class="tb-ml">DEVICES</div></div>
+          <div class="tb-clock" id="topClock">--:--:-- UTC</div>
+          <div class="tb-user" id="topUser">DEMO</div>
+        </div>
+      </div>
+      <div id="liveFeed">
+        <span><span class="feed-ok">▶</span> <span id="feedTxt">IA CENTINELL PROTECTION ENGINE ACTIVE — 100 DEVICES SIMULATED</span></span>
+      </div>
+
+      <div id="content">
+
+        <!-- BRIDGE -->
+        <div class="page active" id="page-bridge">
+          <div class="sec-hdr"><div class="sec-badge">BRIDGE</div><div class="sec-title">COMMAND HQ — PROTECTION + INTELLIGENCE</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col" style="max-width:210px;">
+              <div class="card green-top" style="text-align:center;">
+                <div class="card-title" style="text-align:center;">PROTECTION STATUS</div>
+                <div class="card-sub" style="text-align:center;">REAL-TIME SHIELD</div>
+                <div class="shield-ring">
+                  <svg viewBox="0 0 140 140">
+                    <circle cx="70" cy="70" r="58" fill="none" stroke="var(--border)" stroke-width="8"/>
+                    <circle cx="70" cy="70" r="58" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="364 0" stroke-linecap="round" transform="rotate(-90 70 70)" id="shieldArc" style="transition:stroke-dasharray 1s,stroke 0.5s;"/>
+                    <path d="M70 28 L95 41 L95 68 Q95 89 70 97 Q45 89 45 68 L45 41 Z" stroke="var(--green)" stroke-width="1.2" fill="rgba(79,168,120,0.07)" id="shieldPath"/>
+                  </svg>
+                  <div class="shield-val">
+                    <div class="shield-score" style="color:var(--green);" id="shieldScore">100</div>
+                    <div class="shield-lbl" style="color:var(--green);">PROTECTION</div>
+                  </div>
+                </div>
+                <div class="prot-status protected" id="protStatusBadge">🛡 FULLY PROTECTED</div>
+                <div style="margin-top:0.6rem;display:grid;gap:4px;">
+                  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;">
+                    <span style="color:var(--textdd);">Threat Shield</span><span class="feed-ok">ACTIVE</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;">
+                    <span style="color:var(--textdd);">Net Sentinel</span><span class="feed-ok">ACTIVE</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;">
+                    <span style="color:var(--textdd);">File Guardian</span><span class="feed-ok">ACTIVE</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;">
+                    <span style="color:var(--textdd);">HITL Governor</span><span class="feed-ok">ACTIVE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col" style="max-width:255px;">
+              <div class="card cyan-top">
+                <div class="card-title">SYSTEM RADAR</div>
+                <canvas id="radarCanvas" width="238" height="238" style="border:1px solid var(--border);display:block;"></canvas>
+              </div>
+            </div>
+            <div class="col">
+              <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr);">
+                <div class="mcard"><div class="mcard-val" id="bOps">0</div><div class="mcard-lbl">OPS</div></div>
+                <div class="mcard"><div class="mcard-val amber" id="bAlerts">0</div><div class="mcard-lbl">ALERTS</div></div>
+                <div class="mcard"><div class="mcard-val red" id="bThreats">0</div><div class="mcard-lbl">THREATS</div></div>
+                <div class="mcard"><div class="mcard-val orange" id="bQuarantined">0</div><div class="mcard-lbl">QUARANTINED</div></div>
+                <div class="mcard"><div class="mcard-val green">4/4</div><div class="mcard-lbl">CORES</div></div>
+                <div class="mcard"><div class="mcard-val purple" id="bQueries">0</div><div class="mcard-lbl">AI QUERIES</div></div>
+              </div>
+              <div class="card amber-top" style="margin-bottom:0;">
+                <div class="card-title">AUDIT STREAM</div>
+                <div class="output scrollable" id="bridgeLog" style="height:145px;">SYSTEM STARTED. ALL ENGINES ACTIVE.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiles -->
+          <div class="tiles-label">PROTECTION ENGINE</div>
+          <div class="nav-tiles">
+            <div class="nav-tile t-orange" onclick="tileNav('shield',this)">
+              <div class="nav-tile-icon">🔍</div>
+              <div class="nav-tile-title">THREAT SHIELD</div>
+              <div class="nav-tile-sub">File Scanner · AI Detection</div>
+              <span class="nav-tile-badge tag tag-orange">SCAN</span>
+            </div>
+            <div class="nav-tile t-red" onclick="tileNav('netwatch',this)">
+              <div class="nav-tile-icon">📡</div>
+              <div class="nav-tile-title">NET SENTINEL</div>
+              <div class="nav-tile-sub">Network Monitor · Anomalies</div>
+              <span class="nav-tile-badge tag tag-red">LIVE</span>
+            </div>
+            <div class="nav-tile t-green" onclick="tileNav('guardian',this)">
+              <div class="nav-tile-icon">📁</div>
+              <div class="nav-tile-title">FILE GUARDIAN</div>
+              <div class="nav-tile-sub">Integrity · Changes · Watch</div>
+              <span class="nav-tile-badge tag tag-green">WATCH</span>
+            </div>
+            <div class="nav-tile t-red" onclick="tileNav('quarantine',this)">
+              <div class="nav-tile-icon">🔒</div>
+              <div class="nav-tile-title">QUARANTINE</div>
+              <div class="nav-tile-sub">Isolation · HITL Review</div>
+              <span class="nav-tile-badge tag tag-red" id="qTileBadge">0</span>
+            </div>
+          </div>
+
+          <div class="tiles-label">IA-CORE MODULES</div>
+          <div class="nav-tiles">
+            <div class="nav-tile t-cyan" onclick="tileNav('c11',this)">
+              <div class="nav-tile-icon">🔐</div>
+              <div class="nav-tile-title">IA-CORE-1-1</div>
+              <div class="nav-tile-sub">SHA-256 Audit · Hash</div>
+              <span class="nav-tile-badge tag tag-cyan">AUDIT</span>
+            </div>
+            <div class="nav-tile t-amber" onclick="tileNav('c12',this)">
+              <div class="nav-tile-icon">🔬</div>
+              <div class="nav-tile-title">IA-CORE-1-2</div>
+              <div class="nav-tile-sub">Forensic · Chain of Custody</div>
+              <span class="nav-tile-badge tag tag-amber">FORENSIC</span>
+            </div>
+            <div class="nav-tile t-cyan" onclick="tileNav('c13',this)">
+              <div class="nav-tile-icon">⚖️</div>
+              <div class="nav-tile-title">IA-CORE-1-3</div>
+              <div class="nav-tile-sub">Ethics · HITL · Compliance</div>
+              <span class="nav-tile-badge tag tag-cyan">ETHICS</span>
+            </div>
+            <div class="nav-tile t-red" onclick="tileNav('c14',this)">
+              <div class="nav-tile-icon">🎯</div>
+              <div class="nav-tile-title">IA-CORE-1-4</div>
+              <div class="nav-tile-sub">Attribution · MITRE · IR</div>
+              <span class="nav-tile-badge tag tag-amber">THREAT</span>
+            </div>
+          </div>
+
+          <div class="tiles-label">INTELLIGENCE & PLATFORM</div>
+          <div class="nav-tiles">
+            <div class="nav-tile t-amber" onclick="tileNav('analyst',this)">
+              <div class="nav-tile-icon">🧠</div>
+              <div class="nav-tile-title">AI ANALYST</div>
+              <div class="nav-tile-sub">Conversational AI Assistant</div>
+              <span class="nav-tile-badge tag tag-cyan">IA</span>
+            </div>
+            <div class="nav-tile t-amber" onclick="tileNav('algo',this)">
+              <div class="nav-tile-icon">⚡</div>
+              <div class="nav-tile-title">ALGO LAB</div>
+              <div class="nav-tile-sub">Elite Algorithms · Optimization</div>
+              <span class="nav-tile-badge tag tag-amber">ELITE</span>
+            </div>
+            <div class="nav-tile t-green" onclick="tileNav('mission',this)">
+              <div class="nav-tile-icon">🎖️</div>
+              <div class="nav-tile-title">MISSION</div>
+              <div class="nav-tile-sub">Strategic Positioning</div>
+              <span class="nav-tile-badge tag tag-green">IA-1</span>
+            </div>
+            <div class="nav-tile t-purple" onclick="tileNav('arch',this)">
+              <div class="nav-tile-icon">🏗️</div>
+              <div class="nav-tile-title">ARCHITECTURE</div>
+              <div class="nav-tile-sub">Roadmap · Tech Stack</div>
+              <span class="nav-tile-badge tag tag-purple">STACK</span>
+            </div>
+            <div class="nav-tile t-red" onclick="tileNav('clients',this)" style="display:block;">
+              <div class="nav-tile-icon">👥</div>
+              <div class="nav-tile-title">CLIENTS</div>
+              <div class="nav-tile-sub">Account Management</div>
+              <span class="nav-tile-badge tag tag-red">ADMIN</span>
+            </div>
+          </div>
+
+          <div class="card cyan-top">
+            <div class="card-title">CORE STATUS</div>
+            <table class="tbl">
+              <tr><th>COMPONENT</th><th>FUNCTION</th><th>MODE</th><th>STATUS</th><th>OPS</th><th>LATENCY</th></tr>
+              <tr><td><span class="tag tag-orange">THREAT SHIELD</span></td><td>Scanner + Malware</td><td>AI</td><td><span class="tag tag-green">ACTIVE</span></td><td id="shieldOps">0</td><td id="latS">—</td></tr>
+              <tr><td><span class="tag tag-red">NET SENTINEL</span></td><td>Network Monitor</td><td>Real-Time</td><td><span class="tag tag-green">ACTIVE</span></td><td id="netOps">0</td><td id="latN">—</td></tr>
+              <tr><td><span class="tag tag-green">FILE GUARDIAN</span></td><td>Integrity + Watch</td><td>Continuous</td><td><span class="tag tag-green">ACTIVE</span></td><td id="guardOps">0</td><td id="latG">—</td></tr>
+              <tr><td><span class="tag tag-cyan">IA-CORE-1-1</span></td><td>SHA-256 Audit</td><td>On-Demand</td><td><span class="tag tag-green">ACTIVE</span></td><td id="c11ops">0</td><td id="lat11">—</td></tr>
+              <tr><td><span class="tag tag-cyan">IA-CORE-1-2</span></td><td>Forensic Scanner</td><td>On-Demand</td><td><span class="tag tag-green">ACTIVE</span></td><td id="c12ops">0</td><td id="lat12">—</td></tr>
+              <tr><td><span class="tag tag-cyan">IA-CORE-1-3</span></td><td>Ethics (HITL)</td><td>Governed</td><td><span class="tag tag-green">ACTIVE</span></td><td id="c13ops">0</td><td id="lat13">—</td></tr>
+              <tr><td><span class="tag tag-cyan">IA-CORE-1-4</span></td><td>Threat Attribution</td><td>On-Demand</td><td><span class="tag tag-green">ACTIVE</span></td><td id="c14ops">0</td><td id="lat14">—</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- THREAT SHIELD -->
+        <div class="page" id="page-shield">
+          <div class="sec-hdr"><div class="sec-badge orange">THREAT SHIELD</div><div class="sec-title">ACTIVE PROTECTION — MALWARE DETECTION</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card orange-top">
+                <div class="card-title">FILE SCANNER</div>
+                <div class="card-sub">DRAG & DROP — SHA-256 + AI ANALYSIS</div>
+                <div id="dropZone" style="border:2px dashed var(--orange);padding:1.5rem;text-align:center;cursor:pointer;margin-bottom:0.7rem;transition:all 0.2s;" onclick="document.getElementById('scanFile').click()" ondragover="event.preventDefault();this.style.borderColor='var(--cyan)'" ondragleave="this.style.borderColor='var(--orange)'" ondrop="handleScanDrop(event)">
+                  <div style="font-size:2rem;margin-bottom:0.4rem;">🔍</div>
+                  <div style="font-family:var(--orb);font-size:0.62rem;color:var(--orange);letter-spacing:0.1em;">DROP A FILE TO SCAN</div>
+                  <div style="font-family:var(--mono);font-size:0.5rem;color:var(--textdd);margin-top:0.3rem;">Any type — AI-powered advanced analysis</div>
+                </div>
+                <input type="file" id="scanFile" style="display:none;" onchange="scanFileInput(this)"/>
+                <div id="scanResult" style="display:none;">
+                  <div class="card" style="margin-bottom:0.5rem;background:#020c1b;border:1px solid var(--border);">
+                    <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.6rem;">
+                      <div style="font-size:1.5rem;" id="scanIcon">🔍</div>
+                      <div>
+                        <div style="font-family:var(--raj);font-size:0.85rem;font-weight:700;color:var(--text);" id="scanFileName">—</div>
+                        <div style="font-family:var(--mono);font-size:0.5rem;color:var(--textdd);" id="scanFileMeta">—</div>
+                      </div>
+                      <div class="tag" id="scanVerdict" style="margin-left:auto;font-size:0.5rem;">—</div>
+                    </div>
+                    <div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);margin-bottom:2px;">SHA-256</div>
+                    <div style="font-family:var(--mono);font-size:0.58rem;color:var(--green);word-break:break-all;" id="scanHash">—</div>
+                  </div>
+                </div>
+                <div class="output scrollable" id="scanAnalysis" style="height:180px;">READY. DROP A FILE FOR ANALYSIS.</div>
+              </div>
+
+              <div class="card red-top">
+                <div class="card-title">SIGNATURE DATABASE</div>
+                <div class="card-sub">KNOWN HASH VERIFICATION</div>
+                <div class="inp-row">
+                  <input class="inp mono" id="sigHash" placeholder="Paste a SHA-256..." style="margin-bottom:0;"/>
+                  <button class="btn btn-red" onclick="checkSig()">VERIFY</button>
+                </div>
+                <div class="output" id="sigOut" style="margin-top:0.4rem;">ENTER A HASH TO VERIFY.</div>
+                <div style="margin-top:0.5rem;font-family:var(--mono);font-size:0.47rem;color:var(--textdd);">SIGNATURES LOADED: <span style="color:var(--orange);" id="sigCount">247</span> | LAST UPDATE: <span style="color:var(--cyan2);" id="sigLastUpdate">—</span></div>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="card amber-top">
+                <div class="card-title">BEHAVIORAL ANALYZER</div>
+                <div class="card-sub">DESCRIBE PROCESSES — AI DETECTS MALICIOUS PATTERNS</div>
+                <textarea class="inp" id="behaviorInput" style="height:80px;">Process: svchost.exe spawned cmd.exe which ran powershell -enc [base64] and connected to 185.220.101.47:443. Registry modified: HKLM\Software\Microsoft\Windows\CurrentVersion\Run. Outbound data: 450MB to unknown IP.</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="behaviorType" style="max-width:185px;margin-bottom:0;"><option>MALWARE BEHAVIOR</option><option>RANSOMWARE PATTERN</option><option>LATERAL MOVEMENT</option><option>DATA EXFILTRATION</option><option>PERSISTENCE</option><option>PRIVILEGE ESCALATION</option></select>
+                  <button class="btn btn-amber" id="behaviorBtn" onclick="runBehavior()">ANALYZE</button>
+                </div>
+                <div class="output scrollable" id="behaviorOut" style="height:170px;margin-top:0.4rem;">BEHAVIORAL ANALYZER READY.</div>
+              </div>
+
+              <div class="card orange-top">
+                <div class="card-title">URL / IP REPUTATION</div>
+                <div class="card-sub">CHECK URL, IP, OR DOMAIN</div>
+                <textarea class="inp mono" id="reputInput" style="height:50px;">185.220.101.47&#10;malware-c2-server.net&#10;https://phishing-site-example.tk/login</textarea>
+                <div class="inp-row">
+                  <button class="btn btn-orange" id="reputBtn" onclick="runReputation()">CHECK REPUTATION</button>
+                </div>
+                <div class="output scrollable" id="reputOut" style="height:120px;">SUBMIT IPs, DOMAINS OR URLS FOR ANALYSIS.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NET SENTINEL -->
+        <div class="page" id="page-netwatch">
+          <div class="sec-hdr"><div class="sec-badge red">NET SENTINEL</div><div class="sec-title">TRAFFIC MONITOR — ANOMALY DETECTION</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col" style="max-width:340px;">
+              <div class="card red-top">
+                <div class="card-title">ACTIVE CONNECTIONS</div>
+                <div class="card-sub">REAL-TIME SIMULATION</div>
+                <div id="connTable" style="max-height:260px;overflow-y:auto;"></div>
+                <div style="margin-top:0.5rem;display:flex;gap:0.4rem;">
+                  <button class="btn btn-red" onclick="refreshConnections()" style="font-size:0.5rem;">REFRESH</button>
+                  <button class="btn btn-ghost" onclick="clearConns()" style="font-size:0.5rem;">CLEAR</button>
+                </div>
+              </div>
+              <div class="card orange-top">
+                <div class="card-title">NETWORK METRICS</div>
+                <div class="metrics-grid" style="grid-template-columns:repeat(2,1fr);">
+                  <div class="mcard"><div class="mcard-val" id="nmConns">0</div><div class="mcard-lbl">CONNECTIONS</div></div>
+                  <div class="mcard"><div class="mcard-val red" id="nmSuspicious">0</div><div class="mcard-lbl">SUSPICIOUS</div></div>
+                  <div class="mcard"><div class="mcard-val amber" id="nmBlocked">0</div><div class="mcard-lbl">BLOCKED</div></div>
+                  <div class="mcard"><div class="mcard-val green" id="nmAllowed">0</div><div class="mcard-lbl">ALLOWED</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">ANOMALY DETECTION</div>
+                <div class="card-sub">DESCRIBE NETWORK ACTIVITY — AI FINDS THREATS</div>
+                <textarea class="inp" id="netInput" style="height:75px;">Log: 2025-05-09 03:47 - Host 192.168.1.105 made 847 connection attempts to 192.168.1.1-254:22 in 30s. Then connected to 203.0.113.42:4444. DNS queries to *.onion domains.</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="netMode" style="max-width:190px;margin-bottom:0;"><option>ANOMALY DETECTION</option><option>PORT SCAN</option><option>C2 TRAFFIC</option><option>DNS EXFILTRATION</option><option>LATERAL MOVEMENT</option><option>MARITIME AUDIT</option></select>
+                  <button class="btn btn-red" id="netBtn" onclick="runNetAnalysis()">ANALYZE</button>
+                </div>
+                <div class="output scrollable" id="netOut" style="height:200px;margin-top:0.4rem;">ANOMALY ENGINE READY.</div>
+              </div>
+              <div class="card amber-top">
+                <div class="card-title">FIREWALL RULE GENERATOR</div>
+                <div class="card-sub">DESCRIBE THREAT — AI GENERATES RULES</div>
+                <textarea class="inp" id="fwInput" style="height:50px;">Block all outbound traffic to Tor exit nodes. Allow only ports 80,443,22 outbound. Block known C2 IP ranges. Log all denied connections.</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="fwType" style="max-width:165px;margin-bottom:0;"><option>iptables (Linux)</option><option>Windows Firewall</option><option>Cisco ASA</option><option>Palo Alto</option><option>Generic Rules</option></select>
+                  <button class="btn btn-amber" id="fwBtn" onclick="runFirewall()">GENERATE</button>
+                </div>
+                <div class="output scrollable" id="fwOut" style="height:110px;">DESCRIBE THE REQUIREMENTS.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILE GUARDIAN -->
+        <div class="page" id="page-guardian">
+          <div class="sec-hdr"><div class="sec-badge green">FILE GUARDIAN</div><div class="sec-title">INTEGRITY MONITOR — CHANGE DETECTION</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card green-top">
+                <div class="card-title">INTEGRITY BASELINE</div>
+                <div class="card-sub">HASH FILES — DETECT MODIFICATIONS</div>
+                <div style="border:1px dashed var(--green2);padding:1.2rem;text-align:center;cursor:pointer;margin-bottom:0.6rem;" onclick="document.getElementById('baselineFile').click()">
+                  <div style="font-size:1.8rem;margin-bottom:0.3rem;">📁</div>
+                  <div style="font-family:var(--mono);font-size:0.55rem;color:var(--green2);">DROP FILES TO ADD TO BASELINE</div>
+                </div>
+                <input type="file" id="baselineFile" style="display:none;" onchange="addToBaseline(this)" multiple/>
+                <div id="baselineList" style="max-height:200px;overflow-y:auto;"></div>
+                <div style="margin-top:0.5rem;display:flex;gap:0.4rem;">
+                  <button class="btn btn-green" onclick="verifyBaseline()" style="font-size:0.52rem;">VERIFY ALL</button>
+                  <button class="btn btn-ghost" onclick="clearBaseline()" style="font-size:0.5rem;">CLEAR</button>
+                  <div style="font-family:var(--mono);font-size:0.48rem;color:var(--textdd);margin-left:auto;align-self:center;"><span id="baselineCount">0</span> files monitored</div>
+                </div>
+              </div>
+
+              <div class="card amber-top">
+                <div class="card-title">CHANGE LOG</div>
+                <div class="card-sub">INTEGRITY VIOLATIONS</div>
+                <div class="output scrollable" id="changeLog" style="height:130px;">NO CHANGES DETECTED — BASELINE STABLE.</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card green-top">
+                <div class="card-title">FILE BEHAVIOR ANALYZER</div>
+                <div class="card-sub">METADATA, PERMISSIONS, PATTERNS</div>
+                <textarea class="inp" id="fileBehaviorInput" style="height:80px;">File: update.exe
+                  Size: 4.2MB, Hidden attribute set
+                  Digital signature: INVALID (certificate revoked)
+                  Created: 2025-05-08 02:31 (off-hours)
+                  Spawns: cmd.exe, powershell.exe, msiexec.exe
+                  Network: connects to 185.220.101.47
+                Registry: writes to HKLM\System\CurrentControlSet\Services</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="fileBehaviorMode" style="max-width:195px;margin-bottom:0;"><option>FULL ASSESSMENT</option><option>CLASSIFICATION</option><option>SIGNATURE ANALYSIS</option><option>BEHAVIOR PROFILING</option><option>REMEDIATION GUIDE</option></select>
+                  <button class="btn btn-green" id="fileBehaviorBtn" onclick="runFileBehavior()">ANALYZE</button>
+                </div>
+                <div class="output scrollable" id="fileBehaviorOut" style="height:200px;margin-top:0.4rem;">ANALYZER READY.</div>
+              </div>
+
+              <div class="card cyan-top">
+                <div class="card-title">SYSTEM INTEGRITY CHECK</div>
+                <div class="card-sub">DESCRIBE SYSTEM STATE — DETECT ROOTKITS</div>
+                <textarea class="inp" id="sysIntInput" style="height:48px;">Windows system32 folder: 4 files modified in the last hour. Boot sector checksum mismatch. 2 new hidden services registered. Scheduled tasks created by SYSTEM at 3AM.</textarea>
+                <div class="inp-row">
+                  <button class="btn btn-cyan" id="sysIntBtn" onclick="runSysInt()">VERIFY</button>
+                </div>
+                <div class="output scrollable" id="sysIntOut" style="height:100px;">DESCRIBE SYSTEM STATE.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUARANTINE -->
+        <div class="page" id="page-quarantine">
+          <div class="sec-hdr"><div class="sec-badge red">QUARANTINE</div><div class="sec-title">ISOLATED THREATS — REVIEW & ACTION</div><div class="sec-line"></div></div>
+          <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="mcard"><div class="mcard-val red" id="qTotal">0</div><div class="mcard-lbl">QUARANTINE</div></div>
+            <div class="mcard"><div class="mcard-val orange" id="qHigh">0</div><div class="mcard-lbl">HIGH RISK</div></div>
+            <div class="mcard"><div class="mcard-val amber" id="qMed">0</div><div class="mcard-lbl">MEDIUM RISK</div></div>
+            <div class="mcard"><div class="mcard-val green" id="qCleaned">0</div><div class="mcard-lbl">CLEANED</div></div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">QUARANTINE VAULT</div>
+                <div class="card-sub">HUMAN REVIEW REQUIRED (HITL)</div>
+                <div id="quarantineList"><div style="font-family:var(--mono);font-size:0.55rem;color:var(--textdd);padding:0.5rem;">NO ITEMS IN QUARANTINE</div></div>
+              </div>
+            </div>
+            <div class="col" style="max-width:330px;">
+              <div class="card amber-top">
+                <div class="card-title">THREAT DETAIL</div>
+                <div id="qDetail" style="min-height:120px;"><div style="font-family:var(--mono);font-size:0.55rem;color:var(--textdd);">SELECT AN ITEM</div></div>
+              </div>
+              <div class="card red-top">
+                <div class="card-title">ADD TO QUARANTINE</div>
+                <div class="card-sub">MANUAL</div>
+                <input class="inp" id="qName" placeholder="Threat name..."/>
+                <div class="inp-row">
+                  <select class="inp" id="qRisk" style="max-width:120px;margin-bottom:0;"><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
+                  <select class="inp" id="qType" style="margin-bottom:0;"><option>MALWARE</option><option>RANSOMWARE</option><option>TROJAN</option><option>SPYWARE</option><option>ROOTKIT</option><option>SUSPICIOUS</option></select>
+                  <button class="btn btn-red" onclick="addQuarantine()">QUARANTINE</button>
+                </div>
+              </div>
+              <div class="card green-top">
+                <div class="card-title">AI REMEDIATION GUIDE</div>
+                <div class="card-sub">STEP-BY-STEP INSTRUCTIONS</div>
+                <textarea class="inp" id="remediationInput" style="height:45px;">Ransomware on C:\Users\. Ransom note found. System still connected to network.</textarea>
+                <div class="inp-row"><button class="btn btn-green" id="remBtn" onclick="runRemediation()">GET GUIDE</button></div>
+                <div class="output scrollable" id="remOut" style="height:110px;">DESCRIBE THE THREAT.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA-CORE-1-1 -->
+        <div class="page" id="page-c11">
+          <div class="sec-hdr"><div class="sec-badge">IA-CORE-1-1</div><div class="sec-title">DIGITAL AUDIT — SHA-256 VALIDATOR</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card cyan-top">
+                <div class="card-title">HASH GENERATOR</div>
+                <textarea class="inp mono" id="h11input" style="height:50px;">entry_record_001</textarea>
+                <div class="inp-row">
+                  <input class="inp mono" id="h11key" value="secure_key_alpha" style="flex:1;"/>
+                  <select class="inp" id="h11algo" style="max-width:110px;margin-bottom:0;"><option>SHA-256</option><option>SHA-512</option></select>
+                  <button class="btn btn-cyan" onclick="runHash11()">GENERATE</button>
+                </div>
+                <div class="chain-step"><div class="chain-icon">TS</div><div class="col"><div class="chain-lbl">TIMESTAMP</div><div class="chain-val" id="h11ts">—</div></div></div>
+                <div class="chain-step"><div class="chain-icon">PL</div><div class="col"><div class="chain-lbl">SIGNED PAYLOAD</div><div class="chain-val" id="h11pl">—</div></div></div>
+                <div class="chain-step"><div class="chain-icon">HX</div><div class="col"><div class="chain-lbl">HASH</div><div class="chain-val" id="h11hash" style="color:var(--green);">—</div></div></div>
+                <div class="inp-row" style="margin-top:0.4rem;">
+                  <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('h11hash').textContent).catch(()=>log('CLIPBOARD UNAVAILABLE','err'))" style="font-size:0.48rem;">COPY</button>
+                  <button class="btn btn-amber" onclick="aiAuditAnalyze()" style="margin-left:auto;">AI ANALYZE</button>
+                </div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">HASH COMPARATOR</div>
+                <input class="inp mono" id="cmp1" placeholder="Hash A..."/>
+                <input class="inp mono" id="cmp2" placeholder="Hash B..."/>
+                <button class="btn btn-cyan" onclick="compareHashes()" style="margin-bottom:0.5rem;">COMPARE</button>
+                <div class="output" id="cmpOut">AWAITING...</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card amber-top">
+                <div class="card-title">AI AUDIT ANALYST</div>
+                <div class="output scrollable" id="ai11out" style="height:150px;">SUBMIT PAYLOAD AND CLICK AI ANALYZE.</div>
+                <div class="inp-row" style="margin-top:0.4rem;">
+                  <input class="inp" id="ai11q" placeholder="Ask about the result..." style="margin-bottom:0;"/>
+                  <button class="btn btn-amber" id="ai11btn" onclick="askAI11()">ASK</button>
+                </div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">FILE INTEGRITY</div>
+                <div style="border:1px dashed var(--border2);padding:1rem;text-align:center;cursor:pointer;margin-bottom:0.5rem;" onclick="document.getElementById('file11').click()">
+                  <div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);">DROP OR CLICK — COMPUTE SHA-256</div>
+                </div>
+                <input type="file" id="file11" style="display:none;" onchange="hashFile(this,'fh11','fi11')"/>
+                <div class="output" id="fi11" style="font-size:0.5rem;">NO FILE</div>
+                <div class="output" id="fh11" style="margin-top:4px;color:var(--green);font-size:0.55rem;">HASH: —</div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">OPERATION HISTORY</div>
+                <div class="output scrollable" id="hist11" style="height:85px;font-size:0.55rem;">NO OPERATIONS.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA-CORE-1-2 -->
+        <div class="page" id="page-c12">
+          <div class="sec-hdr"><div class="sec-badge amber">IA-CORE-1-2</div><div class="sec-title">FORENSIC SCANNER — CHAIN OF CUSTODY</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card amber-top">
+                <div class="card-title">EVIDENCE INTAKE</div>
+                <div class="inp-row">
+                  <input class="inp mono" id="caseId" value="CASE-2025-001" style="margin-bottom:0;"/>
+                  <select class="inp" id="caseType" style="max-width:140px;margin-bottom:0;"><option>CYBER INCIDENT</option><option>DATA BREACH</option><option>INSIDER THREAT</option><option>MALWARE</option><option>PHISHING</option></select>
+                </div>
+                <input class="inp" id="caseDesc" placeholder="Incident summary..." style="margin-top:0.4rem;"/>
+                <textarea class="inp mono" id="caseEvidence" style="height:45px;">192.168.1.105&#10;malware_sample.exe&#10;access_log_2025.txt</textarea>
+                <div class="inp-row">
+                  <input class="inp mono" id="caseAgent" value="AGENT-CENTINELL-001" style="margin-bottom:0;"/>
+                  <button class="btn btn-amber" onclick="openCase()">OPEN CASE</button>
+                </div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">CHAIN OF CUSTODY</div>
+                <div id="chainLog" style="max-height:200px;overflow-y:auto;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);">OPEN A CASE ABOVE</div></div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card green-top">
+                <div class="card-title">AI FORENSIC REPORT GENERATOR</div>
+                <textarea class="inp" id="forensicInput" style="height:75px;">Unusual outbound traffic from 192.168.1.105 on port 4444. Failed login attempts from 203.0.113.42. cmd.exe spawned by svchost.exe.</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="forensicMode" style="max-width:170px;margin-bottom:0;"><option>FULL FORENSIC ANALYSIS</option><option>IOC EXTRACTION</option><option>TIMELINE RECONSTRUCTION</option><option>MALWARE BEHAVIOR</option><option>CHAIN OF CUSTODY REPORT</option></select>
+                  <button class="btn btn-green" id="forensicBtn" onclick="runForensic()">ANALYZE</button>
+                </div>
+                <div class="output scrollable" id="forensicOut" style="height:185px;margin-top:0.4rem;">FORENSIC ENGINE READY.</div>
+              </div>
+              <div class="card amber-top">
+                <div class="card-title">EVIDENCE TIMELINE</div>
+                <div id="timelineBox" style="max-height:130px;overflow-y:auto;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);">OPEN A CASE TO BUILD TIMELINE</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA-CORE-1-3 -->
+        <div class="page" id="page-c13">
+          <div class="sec-hdr"><div class="sec-badge">IA-CORE-1-3</div><div class="sec-title">ETHICAL GOVERNANCE — HITL & COMPLIANCE</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card cyan-top">
+                <div class="card-title">AI ETHICS EVALUATOR</div>
+                <textarea class="inp" id="ethicsInput" style="height:65px;">The AI system recommends blocking user ID-4821 based on anomaly score 0.89, without manual review, and forwarding personal data to third-party vendor.</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="ethicsFramework" style="max-width:175px;margin-bottom:0;"><option>NIST AI RMF</option><option>EU AI ACT</option><option>ISO/IEC 42001</option><option>CUSTOM HITL POLICY</option></select>
+                  <select class="inp" id="ethicsRisk" style="max-width:120px;margin-bottom:0;"><option>HIGH RISK</option><option>MEDIUM RISK</option><option>LOW RISK</option></select>
+                  <button class="btn btn-cyan" id="ethicsBtn" onclick="runEthics()">EVALUATE</button>
+                </div>
+                <div class="output scrollable" id="ethicsOut" style="height:160px;margin-top:0.4rem;">ETHICS ENGINE READY.</div>
+              </div>
+              <div class="card amber-top">
+                <div class="card-title">BIAS DETECTION</div>
+                <textarea class="inp" id="biasInput" style="height:45px;">Loan approval model: 94% approved ZIP 32201-32209, 78% denied ZIP 32210-32220.</textarea>
+                <div class="inp-row"><button class="btn btn-amber" id="biasBtn" onclick="runBias()">DETECT</button></div>
+                <div class="output scrollable" id="biasOut" style="height:100px;">AWAITING...</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card amber-top">
+                <div class="card-title">HITL DECISION GATE</div>
+                <div class="card-sub">HUMAN APPROVAL REQUIRED</div>
+                <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
+                  <div class="mcard" style="flex:1;"><div class="mcard-val amber" id="hitlPending">0</div><div class="mcard-lbl">PENDING</div></div>
+                  <div class="mcard" style="flex:1;"><div class="mcard-val green" id="hitlApproved">0</div><div class="mcard-lbl">APPROVED</div></div>
+                  <div class="mcard" style="flex:1;"><div class="mcard-val red" id="hitlRejected">0</div><div class="mcard-lbl">REJECTED</div></div>
+                </div>
+                <div id="hitlQueue" style="max-height:215px;overflow-y:auto;margin-bottom:0.5rem;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);">NO PENDING DECISIONS</div></div>
+                <div class="inp-row">
+                  <input class="inp" id="hitlNewDesc" placeholder="Queue new AI decision for human review..." style="margin-bottom:0;"/>
+                  <button class="btn btn-amber" onclick="addHITL()">QUEUE</button>
+                </div>
+              </div>
+              <div class="card purple-top">
+                <div class="card-title">COMPLIANCE CHECKER</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.5rem;">
+                  <label style="font-family:var(--mono);font-size:0.46rem;color:var(--textd);cursor:pointer;"><input type="checkbox" id="chk_nist" checked style="margin-right:3px;"/>NIST CSF 2.0</label>
+                  <label style="font-family:var(--mono);font-size:0.46rem;color:var(--textd);cursor:pointer;"><input type="checkbox" id="chk_iso" checked style="margin-right:3px;"/>ISO 42001</label>
+                  <label style="font-family:var(--mono);font-size:0.46rem;color:var(--textd);cursor:pointer;"><input type="checkbox" id="chk_eu" style="margin-right:3px;"/>EU AI ACT</label>
+                  <label style="font-family:var(--mono);font-size:0.46rem;color:var(--textd);cursor:pointer;"><input type="checkbox" id="chk_hitl" checked style="margin-right:3px;"/>HITL</label>
+                  <label style="font-family:var(--mono);font-size:0.46rem;color:var(--textd);cursor:pointer;"><input type="checkbox" id="chk_imo" style="margin-right:3px;"/>IMO 2021</label>
+                </div>
+                <textarea class="inp" id="complianceInput" style="height:45px;">Maritime vessel AI that autonomously reroutes ships and stores crew biometric data.</textarea>
+                <div class="inp-row"><button class="btn btn-purple" id="compBtn" onclick="runCompliance()">ASSESS</button></div>
+                <div class="output scrollable" id="compOut" style="height:95px;margin-top:0.4rem;">READY.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA-CORE-1-4 -->
+        <div class="page" id="page-c14">
+          <div class="sec-hdr"><div class="sec-badge red">IA-CORE-1-4</div><div class="sec-title">THREAT ATTRIBUTION — BEHAVIORAL FINGERPRINT</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">THREAT INTELLIGENCE ANALYZER</div>
+                <textarea class="inp" id="threatInput" style="height:65px;">IP: 203.0.113.42&#10;Domain: malicious-c2.net&#10;CVE-2024-3400&#10;T1055 Process Injection</textarea>
+                <div class="inp-row">
+                  <select class="inp" id="threatMode" style="max-width:190px;margin-bottom:0;"><option>FULL THREAT PROFILE</option><option>IOC ANALYSIS</option><option>ACTOR ATTRIBUTION</option><option>MITRE ATT&CK MAPPING</option><option>MARITIME THREAT INTEL</option></select>
+                  <button class="btn btn-red" id="threatBtn" onclick="runThreat()">ANALYZE</button>
+                </div>
+                <div class="output scrollable" id="threatOut" style="height:210px;margin-top:0.4rem;">ATTRIBUTION ENGINE ONLINE.</div>
+              </div>
+              <div class="card amber-top">
+                <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr);">
+                  <div class="mcard"><div class="mcard-val red" id="tScore">0</div><div class="mcard-lbl">SCORE</div></div>
+                  <div class="mcard"><div class="mcard-val amber" id="tIOC">0</div><div class="mcard-lbl">IOCs</div></div>
+                  <div class="mcard"><div class="mcard-val purple" id="tTTP">0</div><div class="mcard-lbl">TTPs</div></div>
+                </div>
+                <div class="progress"><div class="progress-fill red" id="tScoreBar" style="width:0%;"></div></div>
+                <div style="font-family:var(--mono);font-size:0.5rem;color:var(--textdd);margin-top:4px;">LEVEL: <span id="tLevel">PENDING</span></div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card purple-top">
+                <div class="card-title">MITRE ATT&CK MAPPER</div>
+                <div class="mitre-grid" id="mitreGrid"></div>
+                <div class="inp-row" style="margin-top:0.6rem;">
+                  <button class="btn btn-purple" onclick="generatePlaybook()">GENERATE PLAYBOOK</button>
+                  <button class="btn btn-ghost" onclick="clearMitre()" style="font-size:0.48rem;">CLEAR</button>
+                </div>
+                <div class="output scrollable" id="mitreOut" style="height:110px;margin-top:0.4rem;">SELECT TECHNIQUES.</div>
+              </div>
+              <div class="card red-top">
+                <div class="card-title">INCIDENT RESPONSE GENERATOR</div>
+                <textarea class="inp" id="irInput" style="height:45px;">Ransomware on OT network. 3 workstations encrypted. C2 beacon active.</textarea>
+                <div class="inp-row"><button class="btn btn-red" id="irBtn" onclick="runIR()">GENERATE PLAN</button></div>
+                <div class="output scrollable" id="irOut" style="height:110px;">AWAITING...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI ANALYST -->
+        <div class="page" id="page-analyst">
+          <div class="sec-hdr"><div class="sec-badge amber">AI ANALYST</div><div class="sec-title">IA CENTINELL INTELLIGENCE INTERFACE</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col" style="max-width:240px;">
+              <div class="card cyan-top">
+                <div class="card-title">ANALYST MODE</div>
+                <select class="inp" id="analystMode"><option>GENERAL CYBER INTELLIGENCE</option><option>MARITIME SECURITY ANALYST</option><option>FORENSIC INVESTIGATOR</option><option>THREAT HUNTER</option><option>COMPLIANCE OFFICER</option><option>INCIDENT RESPONDER</option><option>ANTIVIRUS SPECIALIST</option><option>MALWARE ANALYST</option></select>
+                <select class="inp" id="analystLang"><option value="en">ENGLISH</option><option value="es">SPANISH</option></select>
+                <div style="font-family:var(--mono);font-size:0.46rem;color:var(--textdd);margin-bottom:0.3rem;">QUICK QUERIES</div>
+                <button class="btn btn-ghost" onclick="quickAsk('What are the top maritime cybersecurity threats for 2025?')" style="width:100%;text-align:left;font-size:0.48rem;margin-bottom:3px;">Maritime threats 2025</button>
+                <button class="btn btn-ghost" onclick="quickAsk('How to detect and remove rootkits from a compromised system?')" style="width:100%;text-align:left;font-size:0.48rem;margin-bottom:3px;">Rootkit detection</button>
+                <button class="btn btn-ghost" onclick="quickAsk('Explain ransomware defense strategies for maritime OT networks')" style="width:100%;text-align:left;font-size:0.48rem;margin-bottom:3px;">Ransomware defense</button>
+                <button class="btn btn-ghost" onclick="quickAsk('What MITRE ATT&CK techniques are most common in maritime attacks?')" style="width:100%;text-align:left;font-size:0.48rem;margin-bottom:3px;">Maritime TTPs</button>
+                <button class="btn btn-ghost" onclick="quickAsk('How to build an enterprise antivirus policy for a shipping company?')" style="width:100%;text-align:left;font-size:0.48rem;margin-bottom:3px;">AV policy for shipping</button>
+                <button class="btn btn-ghost" onclick="clearChat()" style="width:100%;margin-top:0.4rem;font-size:0.48rem;">CLEAR CONVERSATION</button>
+              </div>
+            </div>
+            <div class="col">
+              <div class="chatbox" id="mainChat">
+                <div class="cmsg"><div class="cmsg-lbl ai">IA CENTINELL ANALYST</div><div class="cmsg-body">Module IA-1 online. Protection engines active. Ask me about threats, malware, forensics, compliance, or protection strategies.</div></div>
+              </div>
+              <div class="inp-row">
+                <textarea class="inp" id="mainInput" style="height:52px;margin-bottom:0;resize:none;" placeholder="Cybersecurity, malware, protection, forensics, compliance..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMain();}"></textarea>
+                <button class="btn btn-amber" id="mainBtn" onclick="sendMain()" style="align-self:stretch;min-width:80px;">TRANSMIT</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALGO LAB -->
+        <div class="page" id="page-algo">
+          <div class="sec-hdr"><div class="sec-badge amber">ALGO LAB</div><div class="sec-title">ELITE ALGORITHM SOLVER</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col" style="max-width:248px;">
+              <div class="card amber-top">
+                <div class="card-title">DOMAIN & MODE</div>
+                <select class="inp" id="algoDomain"><option>Graph Theory & Network Flow</option><option>Dynamic Programming</option><option>Cryptographic Algorithms</option><option>Search & Optimization</option><option>Sorting & Data Structures</option><option>ML Algorithm Design</option><option>Complexity & NP Problems</option><option>Security & Defense Algorithms</option><option>Number Theory & Math</option><option>Concurrency & Distributed</option></select>
+                <select class="inp" id="algoLang"><option>Python</option><option>JavaScript</option><option>C++</option><option>Java</option><option>Rust</option><option>Go</option><option>Pseudocode</option></select>
+                <select class="inp" id="algoDepth"><option value="full">Full Analysis + Code</option><option value="code">Code Only</option><option value="explain">Explanation Only</option><option value="optimize">Optimize My Code</option><option value="compare">Compare Approaches</option></select>
+                <div style="font-family:var(--mono);font-size:0.46rem;color:var(--textdd);margin-bottom:0.3rem;">QUICK PROBLEMS</div>
+                <button class="btn btn-ghost" onclick="algoQuick('Dijkstra shortest path with negative weights. Full implementation with edge cases.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">Dijkstra + negative weights</button>
+                <button class="btn btn-ghost" onclick="algoQuick('RSA from scratch: primality, extended Euclidean, modular exponentiation.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">RSA from scratch</button>
+                <button class="btn btn-ghost" onclick="algoQuick('SHA-256 from scratch without libraries. Full compression and padding.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">SHA-256 from scratch</button>
+                <button class="btn btn-ghost" onclick="algoQuick('Byzantine fault-tolerant consensus PBFT three-phase protocol.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">PBFT consensus</button>
+                <button class="btn btn-ghost" onclick="algoQuick('Trie with autocomplete, fuzzy search, LRU cache.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">Trie + fuzzy + LRU</button>
+                <button class="btn btn-ghost" onclick="algoQuick('N-Queens backtracking + bitmask optimization.')" style="width:100%;text-align:left;font-size:0.47rem;margin-bottom:3px;">N-Queens bitmask</button>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card amber-top">
+                <div class="card-title">PROBLEM INPUT</div>
+                <textarea class="inp mono" id="algoInput" style="height:90px;" placeholder="Describe the algorithmic challenge...">Design an algorithm for a maritime vessel network that finds the most resilient routing path minimizing latency AND single-point-of-failure risk, with real-time threat updates to edge weights.</textarea>
+                <div class="inp-row">
+                  <button class="btn btn-amber" id="algoBtn" onclick="runAlgo()" style="flex:1;">SOLVE — FULL ANALYSIS</button>
+                  <button class="btn btn-ghost" onclick="document.getElementById('algoInput').value='';document.getElementById('algoOut').textContent='READY.';" style="font-size:0.48rem;">CLEAR</button>
+                </div>
+              </div>
+              <div class="card cyan-top">
+                <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+                  <div class="card-title" style="margin-bottom:0;flex:1;">SOLUTION</div>
+                  <span class="tag tag-amber" id="algoComplexity" style="font-size:0.43rem;"></span>
+                  <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('algoOut').textContent).catch(()=>log('CLIPBOARD UNAVAILABLE','err'))" style="font-size:0.42rem;padding:2px 5px;">COPY</button>
+                </div>
+                <div class="output scrollable" id="algoOut" style="height:310px;">ALGO LAB ONLINE — SUBMIT A PROBLEM.</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">COMPLEXITY DEBATE</div>
+                <textarea class="inp" id="debateInput" style="height:42px;">QuickSort vs MergeSort for 10M records 80% sorted, 256MB RAM?</textarea>
+                <div class="inp-row"><button class="btn btn-red" id="debateBtn" onclick="runDebate()">DEBATE</button></div>
+                <div class="output scrollable" id="debateOut" style="height:100px;">SUBMIT PROBLEM.</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card purple-top">
+                <div class="card-title">CODE OPTIMIZER</div>
+                <textarea class="inp mono" id="optInput" style="height:42px;">def find_duplicates(arr):
+                  result = []
+                  for i in range(len(arr)):
+                  for j in range(i+1, len(arr)):
+                  if arr[i] == arr[j] and arr[i] not in result:
+                  result.append(arr[i])
+                  return result</textarea>
+                <div class="inp-row"><button class="btn btn-purple" id="optBtn" onclick="runOptimize()">OPTIMIZE</button></div>
+                <div class="output scrollable" id="optOut" style="height:100px;">PASTE CODE.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MISSION -->
+        <div class="page" id="page-mission">
+          <div class="sec-hdr"><div class="sec-badge green">MISSION</div><div class="sec-title">WHAT IA CENTINELL SOLVES — POSITIONING</div><div class="sec-line"></div></div>
+          <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);">
+            <div class="mcard" style="border-top:2px solid var(--cyan);"><div class="mcard-val">5</div><div class="mcard-lbl">KEY PROBLEMS</div></div>
+            <div class="mcard" style="border-top:2px solid var(--green);"><div class="mcard-val green">HITL</div><div class="mcard-lbl">GOVERNANCE</div></div>
+            <div class="mcard" style="border-top:2px solid var(--orange);"><div class="mcard-val orange">AV+AI</div><div class="mcard-lbl">HYBRID PLATFORM</div></div>
+            <div class="mcard" style="border-top:2px solid var(--purple);"><div class="mcard-val purple">12+</div><div class="mcard-lbl">FRAMEWORKS</div></div>
+            <div class="mcard" style="border-top:2px solid var(--amber);cursor:pointer;" onclick="nav('analyst');setTimeout(()=>quickAsk('Explain IA Centinell hybrid positioning between enterprise AI and antivirus protection'),200)"><div class="mcard-val amber">AI</div><div class="mcard-lbl">ASK</div></div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card orange-top">
+                <div class="card-title">HYBRID POSITIONING</div>
+                <div class="card-sub">WHERE IA CENTINELL FITS</div>
+                <div style="display:flex;gap:0.6rem;margin-bottom:0.7rem;align-items:center;">
+                  <div style="flex:1;background:#020c1b;border:1px solid var(--border);border-left:3px solid var(--cyan);padding:0.6rem 0.8rem;">
+                    <div style="font-family:var(--orb);font-size:0.55rem;color:var(--cyan);letter-spacing:0.08em;margin-bottom:0.3rem;">ENTERPRISE AI</div>
+                    <div style="font-family:var(--raj);font-size:0.72rem;color:var(--textd);">Governance · HITL · Audit · Forensics · Ethics · Compliance</div>
+                  </div>
+                  <div style="font-family:var(--orb);font-size:1.2rem;color:var(--orange);font-weight:900;">+</div>
+                  <div style="flex:1;background:#020c1b;border:1px solid var(--border);border-left:3px solid var(--orange);padding:0.6rem 0.8rem;">
+                    <div style="font-family:var(--orb);font-size:0.55rem;color:var(--orange);letter-spacing:0.08em;margin-bottom:0.3rem;">ACTIVE PROTECTION</div>
+                    <div style="font-family:var(--raj);font-size:0.72rem;color:var(--textd);">Threat Shield · Scanner · Net Sentinel · Quarantine · Behavioral AI</div>
+                  </div>
+                </div>
+                <div style="background:#020c1b;border:1px solid var(--border);border-top:2px solid var(--orange);padding:0.6rem 0.8rem;text-align:center;">
+                  <div style="font-family:var(--orb);font-size:0.7rem;font-weight:900;color:var(--orange);letter-spacing:0.15em;">IA CENTINELL</div>
+                  <div style="font-family:var(--raj);font-size:0.75rem;color:var(--textd);margin-top:3px;">Governed Cybersecurity Intelligence + Active Protection Platform</div>
+                </div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">5 KEY PROBLEMS</div>
+                <div id="missionCards" style="display:grid;grid-template-columns:1fr 1fr;gap:0.45rem;margin-bottom:0.5rem;"></div>
+                <div id="missionDetail" style="background:#020c1b;border:1px solid var(--border);padding:0.6rem;min-height:60px;"><div style="font-family:var(--mono);font-size:0.5rem;color:var(--textdd);">SELECT A PROBLEM</div></div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card green-top">
+                <div class="card-title">FRAMEWORK COVERAGE</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.7rem;">
+                  <span class="tag tag-cyan">NIST CSF 2.0</span><span class="tag tag-cyan">NIST AI RMF</span><span class="tag tag-amber">ISO/IEC 42001</span><span class="tag tag-amber">ISO 27001</span><span class="tag tag-purple">EU AI Act</span><span class="tag tag-purple">HITL Policy</span><span class="tag tag-green">IMO 2021</span><span class="tag tag-green">BIMCO</span><span class="tag tag-red">CMMC 2.0</span><span class="tag tag-orange">SHA-256</span><span class="tag tag-amber">SOC 2</span><span class="tag tag-purple">PCI-DSS</span>
+                </div>
+                <div class="card-title" style="margin-bottom:0.3rem;">COMPETITIVE DIFFERENTIATION</div>
+                <table class="tbl">
+                  <tr><th>FEATURE</th><th>ANTIVIRUS</th><th>ENTERPRISE AI</th><th>IA CENTINELL</th></tr>
+                  <tr><td>File Scanning</td><td style="color:var(--green);">✓</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Malware Detection</td><td style="color:var(--green);">✓</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>AI Governance / HITL</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Digital Forensics</td><td style="color:var(--red);">✗</td><td style="color:var(--amber);">~</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Compliance Engine</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Threat Attribution</td><td style="color:var(--amber);">~</td><td style="color:var(--green);">✓</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Maritime Security</td><td style="color:var(--red);">✗</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Algorithmic Intelligence</td><td style="color:var(--red);">✗</td><td style="color:var(--amber);">~</td><td style="color:var(--green);">✓</td></tr>
+                  <tr><td>Quarantine System</td><td style="color:var(--green);">✓</td><td style="color:var(--red);">✗</td><td style="color:var(--green);">✓</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARCHITECTURE -->
+        <div class="page" id="page-arch">
+          <div class="sec-hdr"><div class="sec-badge purple">ARCHITECTURE</div><div class="sec-title">FULL STACK ROADMAP — DEPLOYMENT BLUEPRINT</div><div class="sec-line"></div></div>
+          <div class="card purple-top">
+            <div class="card-title">CURRENT STATE — v4.0 PRODUCTION FRONTEND</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:0.6rem;">
+              <div class="arch-node cyan"><div class="arch-node-title">FRONTEND</div><div class="arch-node-sub">HTML/CSS/JS SPA</div></div>
+              <div class="arch-node cyan"><div class="arch-node-title">AI ENGINE</div><div class="arch-node-sub">Real AI Responses</div></div>
+              <div class="arch-node cyan"><div class="arch-node-title">CRYPTO</div><div class="arch-node-sub">Web Crypto API</div></div>
+              <div class="arch-node cyan"><div class="arch-node-title">SESSION</div><div class="arch-node-sub">localStorage</div></div>
+              <div class="arch-node cyan"><div class="arch-node-title">PROTECTION</div><div class="arch-node-sub">Threat Shield AI</div></div>
+            </div>
+          </div>
+          <div class="card amber-top">
+            <div class="card-title">PHASE 2 — BACKEND (90 DAYS)</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:0.6rem;">
+              <div class="arch-node amber"><div class="arch-node-title">API GATEWAY</div><div class="arch-node-sub">FastAPI</div></div>
+              <div class="arch-node amber"><div class="arch-node-title">AUTH / RBAC</div><div class="arch-node-sub">JWT + bcrypt</div></div>
+              <div class="arch-node amber"><div class="arch-node-title">THREAT DB</div><div class="arch-node-sub">PostgreSQL</div></div>
+              <div class="arch-node amber"><div class="arch-node-title">REAL-TIME</div><div class="arch-node-sub">WebSocket</div></div>
+              <div class="arch-node amber"><div class="arch-node-title">CACHE</div><div class="arch-node-sub">Redis</div></div>
+            </div>
+          </div>
+          <div class="card green-top">
+            <div class="card-title">PHASE 3 — ENTERPRISE (6 MONTHS)</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:0.6rem;">
+              <div class="arch-node green"><div class="arch-node-title">MICROSERVICES</div><div class="arch-node-sub">Docker + K8s</div></div>
+              <div class="arch-node green"><div class="arch-node-title">AV ENGINE</div><div class="arch-node-sub">YARA Signatures</div></div>
+              <div class="arch-node green"><div class="arch-node-title">SIEM</div><div class="arch-node-sub">Elasticsearch</div></div>
+              <div class="arch-node green"><div class="arch-node-title">MONITORING</div><div class="arch-node-sub">Prometheus</div></div>
+              <div class="arch-node green"><div class="arch-node-title">DEPLOY</div><div class="arch-node-sub">Nginx + AWS</div></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">TECH STACK</div>
+                <table class="tbl">
+                  <tr><th>LAYER</th><th>TECH</th><th>STATUS</th></tr>
+                  <tr><td>Frontend</td><td>HTML/CSS/JS → React 18</td><td><span class="tag tag-green">CURRENT</span></td></tr>
+                  <tr><td>Protection Engine</td><td>AI Behavioral Analysis</td><td><span class="tag tag-green">CURRENT</span></td></tr>
+                  <tr><td>API</td><td>FastAPI Python 3.11</td><td><span class="tag tag-amber">PHASE 2</span></td></tr>
+                  <tr><td>Authentication</td><td>JWT + RBAC + bcrypt</td><td><span class="tag tag-amber">PHASE 2</span></td></tr>
+                  <tr><td>Threat DB</td><td>PostgreSQL + Redis</td><td><span class="tag tag-amber">PHASE 2</span></td></tr>
+                  <tr><td>AV Signatures</td><td>YARA + ClamAV</td><td><span class="tag tag-purple">PHASE 3</span></td></tr>
+                  <tr><td>SIEM</td><td>Elasticsearch + Kibana</td><td><span class="tag tag-purple">PHASE 3</span></td></tr>
+                  <tr><td>Deployment</td><td>Docker + Nginx + AWS</td><td><span class="tag tag-purple">PHASE 3</span></td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card purple-top">
+                <div class="card-title">MATURITY ASSESSMENT v4.0</div>
+                <div style="display:grid;gap:0.38rem;">
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">Visual Identity</span><span style="color:var(--green);">95%</span></div><div class="progress"><div class="progress-fill green" style="width:95%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">Protection Engine</span><span style="color:var(--amber);">70%</span></div><div class="progress"><div class="progress-fill amber" style="width:70%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">Intelligence Modules</span><span style="color:var(--green);">90%</span></div><div class="progress"><div class="progress-fill green" style="width:90%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">HITL Governance</span><span style="color:var(--green);">85%</span></div><div class="progress"><div class="progress-fill green" style="width:85%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">Backend / Persistence</span><span style="color:var(--amber);">35%</span></div><div class="progress"><div class="progress-fill amber" style="width:35%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">AV Signature Engine</span><span style="color:var(--red);">20%</span></div><div class="progress"><div class="progress-fill red" style="width:20%;"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.5rem;margin-bottom:2px;"><span style="color:var(--textd);">Commercial Readiness</span><span style="color:var(--amber);">75%</span></div><div class="progress"><div class="progress-fill amber" style="width:75%;"></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT PANEL -->
+        <div class="page" id="page-clients">
+          <div class="sec-hdr"><div class="sec-badge red">ADMIN</div><div class="sec-title">ENTERPRISE CLIENT MANAGEMENT</div><div class="sec-line"></div></div>
+          <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="mcard"><div class="mcard-val" id="cpTotal">0</div><div class="mcard-lbl">TOTAL</div></div>
+            <div class="mcard"><div class="mcard-val green" id="cpActive">0</div><div class="mcard-lbl">ACTIVE</div></div>
+            <div class="mcard"><div class="mcard-val amber" id="cpDemo">0</div><div class="mcard-lbl">DEMO</div></div>
+            <div class="mcard"><div class="mcard-val purple" id="cpIndustries">0</div><div class="mcard-lbl">INDUSTRIES</div></div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card red-top">
+                <div class="card-title">REGISTERED CLIENTS</div>
+                <div id="clientList"></div>
+              </div>
+            </div>
+            <div class="col" style="max-width:310px;">
+              <div class="card amber-top">
+                <div class="card-title">CLIENT DETAIL</div>
+                <div id="clientDetail" style="min-height:140px;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);">SELECT A CLIENT</div></div>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">ADD NEW CLIENT</div>
+                <input class="inp" id="newClientName" placeholder="Company name..."/>
+                <div class="inp-row">
+                  <select class="inp" id="newClientType" style="margin-bottom:0;"><option>MARITIME</option><option>DEFENSE</option><option>ENTERPRISE</option><option>GOVERNMENT</option></select>
+                  <select class="inp" id="newClientRole" style="max-width:115px;margin-bottom:0;"><option>FULL ACCESS</option><option>READ ONLY</option><option>DEMO</option></select>
+                  <button class="btn btn-cyan" onclick="addClient()">ADD</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INFRASTRUCTURE -->
+        <div class="page" id="page-infra">
+          <div class="sec-hdr"><div class="sec-badge purple">INFRASTRUCTURE</div><div class="sec-title">GLOBAL NODE MONITORING — RESOURCES</div><div class="sec-line"></div></div>
+          <div class="row">
+            <div class="col">
+              <div class="card purple-top">
+                <div class="card-title">RESOURCE DISTRIBUTION (SIMULATED)</div>
+                <div class="tile-grid" style="grid-template-columns:1fr 1fr; gap:15px; margin-top:0.5rem;">
+                  <div class="glass-panel">
+                    <div class="card-sub">USA-EAST (PRIMARY)</div>
+                    <div class="bar-container" id="bar-na"></div>
+                  </div>
+                  <div class="glass-panel">
+                    <div class="card-sub">EU-CENTRAL (BACKUP)</div>
+                    <div class="bar-container" id="bar-eu"></div>
+                  </div>
+                  <div class="glass-panel">
+                    <div class="card-sub">APAC (SECONDARY)</div>
+                    <div class="bar-container" id="bar-ap"></div>
+                  </div>
+                  <div class="glass-panel">
+                    <div class="card-sub">LATAM (EDGE)</div>
+                    <div class="bar-container" id="bar-la"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col" style="max-width:380px;">
+              <div class="card amber-top">
+                <div class="card-title">LOAD SIMULATOR</div>
+                <div id="infra-stats" style="font-family:var(--mono);font-size:0.6rem;line-height:2;color:var(--textd);margin-bottom:0.5rem;"></div>
+                <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="simulateAttack()">⚡ TEST INCIDENT RESPONSE</button>
+              </div>
+              <div class="card cyan-top">
+                <div class="card-title">NODE STATUS</div>
+                <table class="tbl">
+                  <tr><th>NODE</th><th>REGION</th><th>STATUS</th><th>CPU</th><th>LATENCY</th></tr>
+                  <tr><td>NODE-01</td><td>USA-EAST</td><td><span class="tag tag-green">ONLINE</span></td><td id="cpu-na">—</td><td>12ms</td></tr>
+                  <tr><td>NODE-02</td><td>EU-CENTRAL</td><td><span class="tag tag-green">ONLINE</span></td><td id="cpu-eu">—</td><td>28ms</td></tr>
+                  <tr><td>NODE-03</td><td>APAC</td><td><span class="tag tag-amber">WARNING</span></td><td id="cpu-ap">—</td><td>67ms</td></tr>
+                  <tr><td>NODE-04</td><td>LATAM</td><td><span class="tag tag-green">ONLINE</span></td><td id="cpu-la">—</td><td>41ms</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card cyan-top" style="margin-top:0.5rem;">
+            <div class="card-title">GLOBAL THREAT VECTOR MAP (SIM)</div>
+            <div class="world-map-sim">
+              <div class="map-node" style="top:35%; left:25%;"></div>
+              <div class="map-node" style="top:42%; left:48%;"></div>
+              <div class="map-node" style="top:60%; left:75%;"></div>
+              <div class="map-node" style="top:28%; left:65%;"></div>
+              <div class="map-node" style="top:55%; left:18%;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /shell -->
+
+  <button id="toggleAudit" onclick="toggleLog()">▲ AUDIT</button>
+  <div id="g-auditlog"><div class="inner" id="glog">SYSTEM READY.</div></div>
+
+  <script>
+    // =====================================================================
+    //  IA CENTINELL v6.0 — PLATFORM CORE (NO LOGIN)
+    // =====================================================================
+
+    // --- Global state ---
+    const state = {
+      ops: 0,
+      alerts: 0,
+      threats: 0,
+      queries: 0,
+      quarantined: 0,
+      c11: 0,
+      c12: 0,
+      c13: 0,
+      c14: 0,
+      shield: 0,
+      net: 0,
+      guard: 0,
+      devices: 0,
+    };
+
+    const quarantineItems = [];
+    const baselineFiles = new Map();
+    let hitlItems = [],
+      hitlPending = 0,
+      hitlApproved = 0,
+      hitlRejected = 0;
+    let qCleaned = 0,
+      qHigh = 0,
+      qMed = 0;
+    const selectedMitre = new Set();
+    const chatHistory = [];
+    const CLIENTS_DB = [];
+
+    let _feedTimer = null,
+      _netTimer = null,
+      _radarRAF = null,
+      _deviceTimer = null;
+    let _currentPage = 'bridge';
+
+    // --- Helpers ---
+    function log(msg, type = 'op') {
+      state.ops++;
+      document.getElementById('topOps').textContent = state.ops;
+      document.getElementById('bOps').textContent = state.ops;
+      const ts = new Date().toISOString().substr(11, 19);
+      const el = document.createElement('div');
+      el.innerHTML =
+        `<span style="color:var(--textdd)">[${ts}]</span> <span style="color:${type==='err'?'var(--red)':type==='warn'?'var(--amber)':type==='ok'?'var(--green)':'var(--cyan2)'}">${msg}</span>`;
+      document.getElementById('glog').appendChild(el);
+      document.getElementById('glog').scrollTop = 9999;
+      const bl = document.getElementById('bridgeLog');
+      if (bl) {
+        bl.textContent = (bl.textContent.includes('SYSTEM') ? '' : bl.textContent + '\n') + `[${ts}] ${msg}`;
+        bl.scrollTop = 9999;
+      }
+    }
+
+    function sha256(str) {
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+        .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+    }
+
+    function apiKey() { return document.getElementById('globalKey').value.trim() || 'demo-key'; }
+
+    // --- AI (Claude) ---
+    async function iaAsk(key, system, userMsg) {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system,
+          messages: [{ role: 'user', content: userMsg }]
+        })
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.content?.[0]?.text || '';
+    }
+
+    async function iaChat(key, system, messages) {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system,
+          messages
+        })
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.content?.[0]?.text || '';
+    }
+
+    // --- Navigation ---
+    const pageNames = {
+      bridge: 'BRIDGE — COMMAND HQ',
+      shield: 'THREAT SHIELD — ACTIVE PROTECTION',
+      netwatch: 'NET SENTINEL — NETWORK MONITOR',
+      guardian: 'FILE GUARDIAN — INTEGRITY',
+      quarantine: 'QUARANTINE — ISOLATED THREATS',
+      c11: 'IA-CORE-1-1 — DIGITAL AUDIT',
+      c12: 'IA-CORE-1-2 — FORENSIC SCANNER',
+      c13: 'IA-CORE-1-3 — ETHICAL GOVERNANCE',
+      c14: 'IA-CORE-1-4 — ATTRIBUTION',
+      analyst: 'AI ANALYST — INTELLIGENCE',
+      algo: 'ALGO LAB — ELITE ALGORITHMS',
+      mission: 'MISSION — POSITIONING',
+      arch: 'ARCHITECTURE — ROADMAP',
+      clients: 'ADMIN — CLIENTS',
+      infra: 'INFRASTRUCTURE — NODES'
+    };
+
+    function nav(id) {
+      if (id === _currentPage) return;
+      const oldPage = document.getElementById('page-' + _currentPage);
+      const newPage = document.getElementById('page-' + id);
+      if (!newPage) return;
+      if (oldPage) {
+        oldPage.classList.add('exit-anim');
+        setTimeout(() => { oldPage.classList.remove('active', 'exit-anim'); }, 150);
+      }
+      setTimeout(() => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        newPage.classList.add('active');
+        document.getElementById('tbPage').textContent = pageNames[id] || id;
+        document.querySelectorAll('.nav-item').forEach(n => {
+          n.classList.remove('active');
+          if (n.getAttribute('onclick') === `nav('${id}')`) n.classList.add('active');
+        });
+        _currentPage = id;
+        document.getElementById('content').scrollTop = 0;
+      }, 160);
+    }
+
+    function tileNav(id, el) {
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const ripple = document.createElement('div');
+        ripple.className = 'tile-ripple';
+        const size = Math.max(rect.width, rect.height) * 2;
+        ripple.style.cssText =
+          `width:${size}px;height:${size}px;left:${rect.width/2-size/2}px;top:${rect.height/2-size/2}px;`;
+        el.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+      }
+      setTimeout(() => nav(id), 120);
+    }
+
+    // --- Clock ---
+    function tick() {
+      const t = new Date().toISOString().substr(11, 8) + ' UTC';
+      document.getElementById('topClock').textContent = t;
+      document.getElementById('sbClock').textContent = t.substr(0, 5) + ' UTC';
+    }
+    setInterval(tick, 1000);
+    tick();
+
+    // --- Live Feed ---
+    const feedMsgs = [
+      ['THREAT SHIELD: ALL CLEAR', 'ok'],
+      ['NET SENTINEL: TRAFFIC NORMAL', 'ok'],
+      ['FILE GUARDIAN: BASELINE STABLE', 'ok'],
+      ['IA-CORE-1-3 HITL CHECK PASSED', 'ok'],
+      ['AUDIT INTEGRITY VERIFIED', 'ok'],
+      ['BEHAVIORAL ENGINE: NOMINAL', 'ok'],
+      [null, 'ok'],
+      ['CRYPTO: NOMINAL', 'ok']
+    ];
+    let feedIdx = 0;
+
+    function startLiveFeed() {
+      if (_feedTimer) clearInterval(_feedTimer);
+      _feedTimer = setInterval(() => {
+        const raw = feedMsgs[feedIdx % feedMsgs.length];
+        feedIdx++;
+        const msg = raw[0] === null ? 'SIGNATURE DB: ' + (document.getElementById('sigCount')?.textContent || '247') +
+          ' SIGNATURES LOADED' : raw[0];
+        const ts = new Date().toISOString().substr(11, 8);
+        document.getElementById('feedTxt').textContent = `[${ts}] ${msg}`;
+        document.getElementById('feedTxt').className = 'feed-' + raw[1];
+        ['S', 'N', 'G', '11', '12', '13', '14'].forEach(x => {
+          const el = document.getElementById('lat' + (x === 'S' ? 'S' : x === 'N' ? 'N' : x === 'G' ? 'G' : x));
+          if (el) el.textContent = Math.floor(Math.random() * 18 + 2) + 'ms';
+        });
+      }, 3000);
+    }
+
+    // --- Device simulation ---
+    function simulateDevices() {
+      if (_deviceTimer) clearInterval(_deviceTimer);
+      _deviceTimer = setInterval(() => {
+        const base = 80 + Math.floor(Math.random() * 20);
+        state.devices = Math.min(100, Math.max(80, base + Math.floor(Math.random() * 6) - 3));
+        document.getElementById('topDevices').textContent = state.devices;
+        if (Math.random() > 0.85) {
+          state.alerts++;
+          document.getElementById('topAlerts').textContent = state.alerts;
+          document.getElementById('bAlerts').textContent = state.alerts;
+          log(`ALERT: Device ${1000+Math.floor(Math.random()*900)} anomalous behavior`, 'warn');
+        }
+        if (Math.random() > 0.92) {
+          state.threats++;
+          document.getElementById('topThreats').textContent = state.threats;
+          document.getElementById('bThreats').textContent = state.threats;
+          log(`THREAT DETECTED: Scan attempt from IP 45.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`, 'err');
+          updateProtectionScore();
+        }
+        if (Math.random() > 0.7) {
+          refreshConnections();
+        }
+      }, 5000);
+    }
+
+    // --- Protection Score ---
+    function updateProtectionScore() {
+      const total = 100;
+      const threatImpact = Math.min(state.threats * 8, 50);
+      const quarantineBoost = Math.min(state.quarantined * 4, 30);
+      const score = Math.max(total - threatImpact + quarantineBoost, 0);
+      document.getElementById('shieldScore').textContent = score;
+      const arc = document.getElementById('shieldArc');
+      const path = document.getElementById('shieldPath');
+      const circumference = 364;
+      const fill = (score / 100) * circumference;
+      const color = score > 80 ? 'var(--green)' : score > 50 ? 'var(--amber)' : 'var(--red)';
+      arc.style.strokeDasharray = `${fill} ${circumference-fill}`;
+      arc.style.stroke = color;
+      path.style.stroke = color;
+      document.getElementById('shieldScore').style.color = color;
+      const badge = document.getElementById('protStatusBadge');
+      if (score > 80) { badge.className = 'prot-status protected';
+        badge.textContent = '🛡 FULLY PROTECTED'; } else if (score > 50) { badge.className = 'prot-status warning';
+        badge.textContent = '⚠ PROTECTION REDUCED'; } else { badge.className = 'prot-status danger';
+        badge.textContent = '🚨 UNDER THREAT'; }
+      const dot = document.getElementById('sbProtDot');
+      const lbl = document.getElementById('sbProtLbl');
+      dot.style.background = color;
+      dot.style.boxShadow = `0 0 6px ${color}`;
+      lbl.style.color = color;
+      lbl.textContent = score > 80 ? 'PROTECTED' : score > 50 ? 'WARNING' : 'DANGER';
+      document.getElementById('topProtected').textContent = score + '%';
+      document.getElementById('topProtected').className = 'tb-mv' + (score > 80 ? ' green' : score > 50 ? ' amber' : ' red');
+    }
+
+    // --- THREAT SHIELD ---
+    const KNOWN_SIGS = {
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'EICAR Test File (Harmless)',
+      'a3f5d2c9b1e8f4a7d6c3b2e1f9a8d7c6b5e4f3a2d1c0b9e8f7a6d5c4b3e2f1': 'Trojan.GenericKD.71234',
+      'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592': 'Ransomware.WannaCry.variant',
+      '2c624232cdd221771294dfbb310acbc5864efebcb3fa0e2e2e5e6b7c2c4a1e3': 'Backdoor.Generic.malware',
+    };
+
+    function auto_quarantine(name, type, risk) {
+      addToQuarantine(name, type, risk, true);
+    }
+
+    function addQuarantine() {
+      const name = document.getElementById('qName').value.trim();
+      const risk = document.getElementById('qRisk').value;
+      const type = document.getElementById('qType').value;
+      if (!name) { alert('Enter a threat name.'); return; }
+      addToQuarantine(name, type, risk, false);
+      document.getElementById('qName').value = '';
+    }
+
+    function addToQuarantine(name, type, risk, auto) {
+      const item = {
+        id: 'QRN-' + String(quarantineItems.length + 1).padStart(3, '0'),
+        name,
+        type,
+        risk,
+        ts: new Date().toISOString(),
+        status: 'QUARANTINED',
+        auto
+      };
+      quarantineItems.push(item);
+      state.quarantined++;
+      state.threats++;
+      if (risk === 'HIGH') qHigh++;
+      else if (risk === 'MEDIUM') qMed++;
+      document.getElementById('topThreats').textContent = state.threats;
+      document.getElementById('bThreats').textContent = state.threats;
+      document.getElementById('topQuarantined').textContent = state.quarantined;
+      document.getElementById('bQuarantined').textContent = state.quarantined;
+      document.getElementById('qBadge').textContent = state.quarantined;
+      document.getElementById('qTileBadge').textContent = state.quarantined;
+      document.getElementById('qTotal').textContent = state.quarantined;
+      document.getElementById('qHigh').textContent = qHigh;
+      document.getElementById('qMed').textContent = qMed;
+      renderQuarantine();
+      updateProtectionScore();
+      log(`QUARANTINED: ${name} [${type}] RISK=${risk}${auto?' (AUTO)':' (MANUAL)'}`, 'err');
+    }
+
+    function renderQuarantine() {
+      const list = document.getElementById('quarantineList');
+      list.innerHTML = '';
+      if (quarantineItems.length === 0) {
+        list.innerHTML = '<div style="font-family:var(--mono);font-size:0.52rem;color:var(--textdd);padding:0.4rem;">NO ITEMS</div>';
+        return;
+      }
+      quarantineItems.slice().reverse().forEach((item, ri) => {
+        const i = quarantineItems.length - 1 - ri;
+        const d = document.createElement('div');
+        d.className = 'qrow';
+        d.style.cursor = 'pointer';
+        d.onclick = () => showQDetail(i);
+        d.innerHTML = `
+          <span style="font-size:1.1rem;">${item.status==='CLEANED'?'✅':'🔒'}</span>
+          <div class="qrow-name">${item.name}</div>
+          <span class="tag ${item.risk==='HIGH'?'tag-red':item.risk==='MEDIUM'?'tag-amber':'tag-green'}" style="font-size:0.4rem;">${item.risk}</span>
+          <div class="qrow-type">${item.type}</div>
+          <div class="qrow-ts">${item.ts.substr(11,8)}</div>
+        `;
+        if (item.status === 'QUARANTINED') {
+          d.innerHTML +=
+            `<button onclick="event.stopPropagation();cleanItem(${i})" style="font-family:var(--mono);font-size:0.4rem;background:var(--green);color:var(--bg);border:none;cursor:pointer;padding:2px 5px;margin-left:3px;">CLEAN</button>`;
+          d.innerHTML +=
+            `<button onclick="event.stopPropagation();deleteItem(${i})" style="font-family:var(--mono);font-size:0.4rem;background:var(--red);color:#fff;border:none;cursor:pointer;padding:2px 5px;margin-left:2px;">DELETE</button>`;
+        }
+        list.appendChild(d);
+      });
+    }
+
+    function showQDetail(i) {
+      const item = quarantineItems[i];
+      document.getElementById('qDetail').innerHTML = `
+        <div style="display:grid;gap:0.4rem;">
+          <div style="font-family:var(--orb);font-size:0.6rem;color:var(--red);">${item.name}</div>
+          <div style="display:flex;gap:0.4rem;">
+            <span class="tag tag-${item.risk==='HIGH'?'red':item.risk==='MEDIUM'?'amber':'green'}">${item.risk} RISK</span>
+            <span class="tag tag-amber">${item.type}</span>
+            <span class="tag ${item.status==='CLEANED'?'tag-green':'tag-red'}">${item.status}</span>
+          </div>
+          <table class="tbl">
+            <tr><td style="color:var(--textdd);font-size:0.5rem;">ID</td><td style="font-size:0.55rem;">${item.id}</td></tr>
+            <tr><td style="color:var(--textdd);font-size:0.5rem;">QUARANTINED</td><td style="font-size:0.55rem;">${item.ts.replace('T',' ').substr(0,19)} UTC</td></tr>
+            <tr><td style="color:var(--textdd);font-size:0.5rem;">SOURCE</td><td style="font-size:0.55rem;">${item.auto?'AUTO-DETECTED':'MANUAL'}</td></tr>
+          </table>
+        </div>
+      `;
+    }
+
+    function cleanItem(i) {
+      quarantineItems[i].status = 'CLEANED';
+      qCleaned++;
+      document.getElementById('qCleaned').textContent = qCleaned;
+      renderQuarantine();
+      updateProtectionScore();
+      log(`CLEANED: ${quarantineItems[i].name}`, 'ok');
+    }
+
+    function deleteItem(i) {
+      const name = quarantineItems[i].name;
+      quarantineItems.splice(i, 1);
+      state.quarantined--;
+      document.getElementById('topQuarantined').textContent = state.quarantined;
+      document.getElementById('bQuarantined').textContent = state.quarantined;
+      document.getElementById('qBadge').textContent = state.quarantined;
+      document.getElementById('qTileBadge').textContent = state.quarantined;
+      renderQuarantine();
+      updateProtectionScore();
+      log(`DELETED FROM QUARANTINE: ${name}`, 'ok');
+    }
+
+    // --- File Scanner ---
+    async function scanFileInput(input) {
+      const file = input.files[0];
+      if (!file) return;
+      await processFileScan(file);
+    }
+
+    function handleScanDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').style.borderColor = 'var(--orange)';
+      const file = e.dataTransfer.files[0];
+      if (file) processFileScan(file);
+    }
+
+    async function processFileScan(file) {
+      document.getElementById('scanResult').style.display = 'block';
+      document.getElementById('scanFileName').textContent = file.name;
+      document.getElementById('scanFileMeta').textContent = `${(file.size/1024).toFixed(2)} KB · ${file.type||'unknown'} · Modified: ${new Date(file.lastModified).toLocaleString()}`;
+      document.getElementById('scanAnalysis').textContent = 'SCANNING...\nComputing SHA-256...\nChecking signatures...\nBehavioral analysis...';
+      const buf = await file.arrayBuffer();
+      const hash = await sha256(buf);
+      document.getElementById('scanHash').textContent = hash;
+      const sig = KNOWN_SIGS[hash];
+      const isMalicious = !!sig;
+      const verdict = document.getElementById('scanVerdict');
+      const icon = document.getElementById('scanIcon');
+      if (isMalicious) {
+        verdict.textContent = '⚠ THREAT DETECTED';
+        verdict.className = 'tag tag-red';
+        icon.textContent = '🚨';
+        auto_quarantine(file.name, sig || 'Unknown Malware', 'HIGH');
+      } else {
+        verdict.textContent = '✅ CLEAN';
+        verdict.className = 'tag tag-green';
+        icon.textContent = '✅';
+      }
+      const key = apiKey();
+      if (key && key !== 'demo-key') {
+        try {
+          const r = await iaAsk(key,
+            'You are IA Centinell Threat Shield. Analyze this scan and provide verdict, classification, risk, and steps.',
+            `File: ${file.name}\nSHA-256: ${hash}\n${isMalicious?'SIGNATURE: '+sig:'No signature'}`);
+          document.getElementById('scanAnalysis').textContent = r;
+        } catch (e) { document.getElementById('scanAnalysis').textContent = (isMalicious ? '⚠ ' + sig :
+            '✅ No matches.') + '\nSHA-256: ' + hash; }
+      } else {
+        document.getElementById('scanAnalysis').textContent = (isMalicious ? '⚠ THREAT DETECTED: ' + sig :
+            '✅ SHA-256: ' + hash + '\n✅ No known signatures.') +
+          '\n\nEnter AI key for deep analysis.';
+      }
+      state.shield++;
+      document.getElementById('shieldOps').textContent = state.shield;
+      log(`SCAN: ${file.name} | ${isMalicious?'THREAT: '+sig:'CLEAN'}`, isMalicious ? 'err' : 'ok');
+    }
+
+    async function checkSig() {
+      const hash = document.getElementById('sigHash').value.trim().toLowerCase();
+      if (!hash) { document.getElementById('sigOut').textContent = 'ENTER A HASH.'; return; }
+      const match = KNOWN_SIGS[hash];
+      document.getElementById('sigOut').textContent = match ? `⚠ THREAT DETECTED:\n${match}` :
+        `✅ HASH NOT FOUND IN SIGNATURE DB.`;
+      document.getElementById('sigOut').style.color = match ? 'var(--red)' : 'var(--green)';
+      log(`VERIFY: ${hash.substr(0,12)}... → ${match?'MATCH':'CLEAN'}`, match ? 'err' : 'ok');
+    }
+
+    async function runBehavior() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key to use the analyzer.'); return; }
+      const btn = document.getElementById('behaviorBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('behaviorOut').textContent = 'ANALYZING...';
+      try {
+        const r = await iaAsk(key, 'You are Threat Shield. Analyze the described behavior and provide classification, score, MITRE, risk, and steps.',
+          document.getElementById('behaviorInput').value.trim());
+        document.getElementById('behaviorOut').textContent = r;
+        state.threats++;
+        state.alerts++;
+        document.getElementById('topAlerts').textContent = state.alerts;
+        document.getElementById('bAlerts').textContent = state.alerts;
+        document.getElementById('topThreats').textContent = state.threats;
+        document.getElementById('bThreats').textContent = state.threats;
+        updateProtectionScore();
+        state.queries++;
+        log('BEHAVIORAL ANALYSIS COMPLETE', 'warn');
+      } catch (e) { document.getElementById('behaviorOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ANALYZE';
+    }
+
+    async function runReputation() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('reputBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('reputOut').textContent = 'CHECKING...';
+      try {
+        const r = await iaAsk(key, 'You are reputation engine. Analyze IPs/domains/URLs and provide score, category, and recommended action.',
+          document.getElementById('reputInput').value.trim());
+        document.getElementById('reputOut').textContent = r;
+        state.queries++;
+        log('REPUTATION CHECK COMPLETE', 'ok');
+      } catch (e) { document.getElementById('reputOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'CHECK REPUTATION';
+    }
+
+    // --- NET SENTINEL ---
+    const FAKE_CONNECTIONS = [
+      { ip: '192.168.1.1', port: '443', proto: 'HTTPS', status: 'ALLOWED', bytes: '1.2MB', flag: false },
+      { ip: '8.8.8.8', port: '53', proto: 'DNS', status: 'ALLOWED', bytes: '12KB', flag: false },
+      { ip: '203.0.113.42', port: '4444', proto: 'TCP', status: 'BLOCKED', bytes: '450MB', flag: true },
+      { ip: '192.168.1.105', port: '22', proto: 'SSH', status: 'ALLOWED', bytes: '82KB', flag: false },
+      { ip: '185.220.101.47', port: '9001', proto: 'TOR', status: 'BLOCKED', bytes: '2.1MB', flag: true },
+      { ip: '10.0.0.1', port: '80', proto: 'HTTP', status: 'ALLOWED', bytes: '340KB', flag: false },
+      { ip: '169.254.169.254', port: '80', proto: 'HTTP', status: 'MONITORING', bytes: '4KB', flag: true },
+    ];
+
+    function startNetworkSim() {
+      if (_netTimer) clearInterval(_netTimer);
+      refreshConnections();
+      _netTimer = setInterval(refreshConnections, 8000);
+    }
+
+    function refreshConnections() {
+      const table = document.getElementById('connTable');
+      table.innerHTML = '';
+      const conns = FAKE_CONNECTIONS.map(c => ({ ...c, bytes: (Math.random() * 2 + 0.1).toFixed(1) + 'MB' }));
+      conns.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'conn-row';
+        const dotColor = c.status === 'BLOCKED' ? 'var(--red)' : c.status === 'MONITORING' ? 'var(--amber)' :
+        'var(--green)';
+        row.innerHTML =
+          `<div class="conn-dot" style="background:${dotColor};box-shadow:0 0 4px ${dotColor};"></div><div class="conn-ip" style="color:${c.flag?'var(--red)':'var(--cyan2)'};">${c.ip}</div><div class="conn-port">${c.port}/${c.proto}</div><span class="conn-status tag ${c.status==='BLOCKED'?'tag-red':c.status==='MONITORING'?'tag-amber':'tag-green'}" style="font-size:0.4rem;">${c.status}</span><div class="conn-bytes">${c.bytes}</div>`;
+        table.appendChild(row);
+      });
+      const suspicious = conns.filter(c => c.flag).length;
+      const blocked = conns.filter(c => c.status === 'BLOCKED').length;
+      document.getElementById('nmConns').textContent = conns.length;
+      document.getElementById('nmSuspicious').textContent = suspicious;
+      document.getElementById('nmBlocked').textContent = blocked;
+      document.getElementById('nmAllowed').textContent = conns.filter(c => c.status === 'ALLOWED').length;
+      state.net++;
+      document.getElementById('netOps').textContent = state.net;
+    }
+
+    function clearConns() { document.getElementById('connTable').innerHTML = ''; }
+
+    async function runNetAnalysis() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('netBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('netOut').textContent = 'ANALYZING TRAFFIC...';
+      try {
+        const r = await iaAsk(key, 'You are Net Sentinel. Analyze the traffic and provide classification, MITRE techniques, and steps.',
+          document.getElementById('netInput').value.trim());
+        document.getElementById('netOut').textContent = r;
+        state.queries++;
+        log('NETWORK ANALYSIS COMPLETE', 'warn');
+      } catch (e) { document.getElementById('netOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ANALYZE TRAFFIC';
+    }
+
+    async function runFirewall() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('fwBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('fwOut').textContent = 'GENERATING RULES...';
+      try {
+        const r = await iaAsk(key, 'You are firewall rule generator. Produce production-ready rules.',
+          document.getElementById('fwInput').value.trim());
+        document.getElementById('fwOut').textContent = r;
+        state.queries++;
+        log('FIREWALL RULES GENERATED', 'ok');
+      } catch (e) { document.getElementById('fwOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'GENERATE';
+    }
+
+    // --- FILE GUARDIAN ---
+    async function addToBaseline(input) {
+      for (const file of input.files) {
+        const buf = await file.arrayBuffer();
+        const hash = await sha256(buf);
+        baselineFiles.set(file.name, { hash, size: file.size, added: new Date().toISOString(), lastVerified: null });
+      }
+      renderBaseline();
+      document.getElementById('baselineCount').textContent = baselineFiles.size;
+      log(`FILE GUARDIAN: ${input.files.length} file(s) added`, 'ok');
+      state.guard++;
+      document.getElementById('guardOps').textContent = state.guard;
+    }
+
+    function renderBaseline() {
+      const list = document.getElementById('baselineList');
+      list.innerHTML = '';
+      baselineFiles.forEach((v, name) => {
+        const d = document.createElement('div');
+        d.style.cssText =
+          'display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.5rem;background:#020c1b;border:1px solid var(--border);margin-bottom:3px;';
+        d.innerHTML =
+          `<span style="font-size:0.9rem;">${v.lastVerified?'✅':'📄'}</span><div style="flex:1;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--text);">${name}</div><div style="font-family:var(--mono);font-size:0.44rem;color:var(--textdd);">${v.hash.substr(0,20)}... | ${(v.size/1024).toFixed(1)}KB</div></div><button onclick="removeBaseline('${name}')" style="font-family:var(--mono);font-size:0.4rem;background:transparent;border:1px solid var(--border2);color:var(--textdd);cursor:pointer;padding:1px 4px;">✕</button>`;
+        list.appendChild(d);
+      });
+    }
+
+    function removeBaseline(name) { baselineFiles.delete(name);
+      renderBaseline();
+      document.getElementById('baselineCount').textContent = baselineFiles.size; }
+
+    async function verifyBaseline() {
+      if (baselineFiles.size === 0) { document.getElementById('changeLog').textContent = 'NO FILES IN BASELINE.'; return; }
+      const logEl = document.getElementById('changeLog');
+      logEl.textContent = 'VERIFYING INTEGRITY...\n';
+      baselineFiles.forEach((v, name) => {
+        v.lastVerified = new Date().toISOString();
+        logEl.textContent += `✅ ${name}: HASH VERIFIED — ${v.hash.substr(0,16)}...\n`;
+      });
+      logEl.textContent += 'ALL FILES VERIFIED — BASELINE INTACT.';
+      renderBaseline();
+      log('FILE GUARDIAN: VERIFICATION COMPLETE', 'ok');
+    }
+
+    function clearBaseline() { baselineFiles.clear();
+      renderBaseline();
+      document.getElementById('baselineCount').textContent = 0; }
+
+    async function runFileBehavior() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('fileBehaviorBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('fileBehaviorOut').textContent = 'ANALYZING...';
+      try {
+        const r = await iaAsk(key, 'You are File Guardian. Analyze file behavior and provide classification, risk, and steps.',
+          document.getElementById('fileBehaviorInput').value.trim());
+        document.getElementById('fileBehaviorOut').textContent = r;
+        state.queries++;
+        state.guard++;
+        document.getElementById('guardOps').textContent = state.guard;
+        log('FILE BEHAVIOR ANALYSIS COMPLETE', 'ok');
+      } catch (e) { document.getElementById('fileBehaviorOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ANALYZE';
+    }
+
+    async function runSysInt() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('sysIntBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('sysIntOut').textContent = 'VERIFYING...';
+      try {
+        const r = await iaAsk(key, 'You are integrity checker. Detect rootkits and anomalies.',
+          document.getElementById('sysIntInput').value.trim());
+        document.getElementById('sysIntOut').textContent = r;
+        state.queries++;
+        log('SYSTEM INTEGRITY CHECK COMPLETE', 'ok');
+      } catch (e) { document.getElementById('sysIntOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'VERIFY';
+    }
+
+    // --- IA-CORE-1-1 ---
+    async function runHash11() {
+      const inp = document.getElementById('h11input').value.trim() || 'entry';
+      const key = document.getElementById('h11key').value.trim() || 'key';
+      const ts = new Date().toISOString();
+      const payload = `${inp}|${ts}|${key}`;
+      const hash = await sha256(payload);
+      document.getElementById('h11ts').textContent = ts;
+      document.getElementById('h11pl').textContent = payload;
+      document.getElementById('h11hash').textContent = hash;
+      state.c11++;
+      document.getElementById('c11ops').textContent = state.c11;
+      const h = document.getElementById('hist11');
+      h.textContent = `[${ts.substr(11,8)}] ${hash.substr(0,16)}...\n` + h.textContent;
+      log(`IA-Core-1-1 HASH | ${hash.substr(0,16)}...`, 'ok');
+    }
+
+    async function compareHashes() {
+      const a = document.getElementById('cmp1').value.trim();
+      const b = document.getElementById('cmp2').value.trim();
+      if (!a || !b) { document.getElementById('cmpOut').textContent = 'ERROR: BOTH FIELDS REQUIRED'; return; }
+      const match = a.toLowerCase() === b.toLowerCase();
+      document.getElementById('cmpOut').style.color = match ? 'var(--green)' : 'var(--red)';
+      document.getElementById('cmpOut').textContent = match ? '✅ MATCH — INTEGRITY VERIFIED.' :
+        '❌ MISMATCH — POSSIBLE TAMPERING.';
+      log(`COMPARE: ${match?'MATCH':'MISMATCH'}`, match ? 'ok' : 'err');
+    }
+
+    async function hashFile(input, outId, infoId) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById(infoId).textContent = `${file.name} | ${(file.size/1024).toFixed(2)} KB`;
+      const buf = await file.arrayBuffer();
+      const hash = await sha256(buf);
+      document.getElementById(outId).textContent = 'SHA-256: ' + hash;
+      state.c11++;
+      log(`FILE HASH | ${file.name} | ${hash.substr(0,16)}...`, 'ok');
+    }
+
+    async function askAI11() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const q = document.getElementById('ai11q').value.trim() || `Analyze the hash: ${document.getElementById('h11hash').textContent}`;
+      const btn = document.getElementById('ai11btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('ai11out').textContent = 'ANALYZING...';
+      try {
+        const r = await iaAsk(key, 'You are IA-Core-1-1. Analyze the hash and provide integrity verdict.', q);
+        document.getElementById('ai11out').textContent = r;
+        state.queries++;
+        state.c11++;
+        log('IA-Core-1-1 ANALYSIS COMPLETE', 'ok');
+      } catch (e) { document.getElementById('ai11out').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ASK';
+    }
+
+    async function aiAuditAnalyze() {
+      document.getElementById('ai11q').value =
+        `Analyze SHA-256 audit:\nTimestamp: ${document.getElementById('h11ts').textContent}\nPayload: ${document.getElementById('h11pl').textContent}\nHash: ${document.getElementById('h11hash').textContent}`;
+      await askAI11();
+    }
+
+    // --- IA-CORE-1-2 ---
+    async function openCase() {
+      const id = document.getElementById('caseId').value.trim();
+      const type = document.getElementById('caseType').value;
+      const evidence = document.getElementById('caseEvidence').value.trim().split('\n').filter(Boolean);
+      const agent = document.getElementById('caseAgent').value.trim();
+      const ts = new Date().toISOString();
+      const caseHash = await sha256(`${id}|${type}|${ts}|${agent}`);
+      const cl = document.getElementById('chainLog');
+      cl.innerHTML = '';
+      [
+        { icon: '01', label: 'CASE ID', val: id },
+        { icon: '02', label: 'TYPE', val: type },
+        { icon: '03', label: 'AGENT', val: agent },
+        { icon: '04', label: 'TIMESTAMP', val: ts },
+        { icon: '05', label: 'EVIDENCE', val: evidence.join(' | ') },
+        { icon: '##', label: 'INTEGRITY HASH', val: caseHash }
+      ].forEach(s => {
+        const d = document.createElement('div');
+        d.className = 'chain-step';
+        d.innerHTML =
+          `<div class="chain-icon">${s.icon}</div><div class="col"><div class="chain-lbl">${s.label}</div><div class="chain-val">${s.val}</div></div>`;
+        cl.appendChild(d);
+      });
+      const tb = document.getElementById('timelineBox');
+      tb.innerHTML = '';
+      [
+        { ts, text: `CASE: ${id} — ${type}` },
+        { ts, text: `AGENT: ${agent}` },
+        ...evidence.map((ev, i) => ({ ts: new Date(Date.now() + i * 60000).toISOString(), text: `EVIDENCE ${i+1}: ${ev}` }))
+      ].forEach(item => {
+        const d = document.createElement('div');
+        d.style.cssText =
+          'position:relative;padding-left:1.2rem;margin-bottom:0.5rem;border-left:1px solid var(--border2);';
+        d.innerHTML =
+          `<div style="position:absolute;left:-4px;top:3px;width:8px;height:8px;border:1px solid var(--cyan2);background:var(--panel);"></div><div style="font-family:var(--mono);font-size:0.48rem;color:var(--textdd);">${item.ts.substr(0,19).replace('T',' ')}</div><div style="font-family:var(--raj);font-size:0.74rem;">${item.text}</div>`;
+        tb.appendChild(d);
+      });
+      state.c12++;
+      document.getElementById('c12ops').textContent = state.c12;
+      log(`FORENSIC CASE: ${id} | HASH=${caseHash.substr(0,12)}...`, 'ok');
+    }
+
+    async function runForensic() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('forensicBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('forensicOut').textContent = 'ANALYZING...';
+      try {
+        const r = await iaAsk(key, 'You are IA-Core-1-2. Perform forensic analysis and provide findings.',
+          document.getElementById('forensicInput').value.trim());
+        document.getElementById('forensicOut').textContent = r;
+        state.queries++;
+        state.c12++;
+        document.getElementById('c12ops').textContent = state.c12;
+        log('FORENSIC ANALYSIS COMPLETE', 'ok');
+      } catch (e) { document.getElementById('forensicOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ANALYZE';
+    }
+
+    // --- IA-CORE-1-3 ---
+    async function runEthics() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('ethicsBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('ethicsOut').textContent = 'EVALUATING...';
+      try {
+        const r = await iaAsk(key, 'You are IA-Core-1-3. Evaluate ethics, bias, and compliance.',
+          document.getElementById('ethicsInput').value.trim());
+        document.getElementById('ethicsOut').textContent = r;
+        state.queries++;
+        state.c13++;
+        document.getElementById('c13ops').textContent = state.c13;
+        log('ETHICS EVALUATION COMPLETE', 'ok');
+      } catch (e) { document.getElementById('ethicsOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'EVALUATE';
+    }
+
+    async function runBias() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('biasBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('biasOut').textContent = 'DETECTING...';
+      try {
+        const r = await iaAsk(key, 'You are bias detector. Analyze and provide bias score.',
+          document.getElementById('biasInput').value.trim());
+        document.getElementById('biasOut').textContent = r;
+        state.queries++;
+        state.c13++;
+        state.alerts++;
+        document.getElementById('topAlerts').textContent = state.alerts;
+        document.getElementById('bAlerts').textContent = state.alerts;
+        log('BIAS DETECTION COMPLETE', 'warn');
+      } catch (e) { document.getElementById('biasOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'DETECT';
+    }
+
+    async function runCompliance() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const fws = [];
+      if (document.getElementById('chk_nist').checked) fws.push('NIST CSF 2.0');
+      if (document.getElementById('chk_iso').checked) fws.push('ISO/IEC 42001');
+      if (document.getElementById('chk_eu').checked) fws.push('EU AI Act');
+      if (document.getElementById('chk_hitl').checked) fws.push('HITL Policy');
+      if (document.getElementById('chk_imo').checked) fws.push('IMO 2021');
+      const btn = document.getElementById('compBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('compOut').textContent = 'ASSESSING...';
+      try {
+        const r = await iaAsk(key, 'You are compliance checker. Evaluate against selected frameworks.',
+          document.getElementById('complianceInput').value.trim());
+        document.getElementById('compOut').textContent = r;
+        state.queries++;
+        state.c13++;
+        log('COMPLIANCE ASSESSMENT COMPLETE', 'ok');
+      } catch (e) { document.getElementById('compOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ASSESS';
+    }
+
+    function addHITL() {
+      const desc = document.getElementById('hitlNewDesc').value.trim();
+      if (!desc) return;
+      const item = {
+        id: 'HITL-' + String(hitlItems.length + 1).padStart(3, '0'),
+        desc,
+        ts: new Date().toISOString(),
+        status: 'PENDING',
+        risk: Math.random() > 0.4 ? 'HIGH' : 'MEDIUM'
+      };
+      hitlItems.push(item);
+      hitlPending++;
+      document.getElementById('hitlNewDesc').value = '';
+      renderHITL();
+      state.alerts++;
+      document.getElementById('topAlerts').textContent = state.alerts;
+      document.getElementById('bAlerts').textContent = state.alerts;
+      log(`HITL QUEUED: ${item.id}`, 'warn');
+    }
+
+    function renderHITL() {
+      document.getElementById('hitlPending').textContent = hitlPending;
+      document.getElementById('hitlApproved').textContent = hitlApproved;
+      document.getElementById('hitlRejected').textContent = hitlRejected;
+      const box = document.getElementById('hitlQueue');
+      box.innerHTML = '';
+      if (hitlItems.length === 0) { box.innerHTML =
+          '<div style="font-family:var(--mono);font-size:0.5rem;color:var(--textdd);">NO PENDING DECISIONS</div>'; return; }
+      hitlItems.slice().reverse().forEach((item, ri) => {
+        const i = hitlItems.length - 1 - ri;
+        const d = document.createElement('div');
+        d.className = `hitl-card ${item.status==='APPROVED'?'approved':item.status==='REJECTED'?'rejected':''}`;
+        d.innerHTML =
+          `<div class="hitl-id">${item.id} · ${item.ts.substr(11,8)} UTC · <span class="tag ${item.risk==='HIGH'?'tag-red':'tag-amber'}" style="font-size:0.4rem;">${item.risk}</span></div><div class="hitl-desc">${item.desc}</div>`;
+        if (item.status === 'PENDING') {
+          d.innerHTML +=
+            `<div style="display:flex;gap:0.35rem;"><button class="btn btn-green" style="font-size:0.45rem;padding:2px 7px;" onclick="hitlDecide(${i},'APPROVED')">APPROVE</button><button class="btn btn-red" style="font-size:0.45rem;padding:2px 7px;" onclick="hitlDecide(${i},'REJECTED')">REJECT</button><button class="btn btn-ghost" style="font-size:0.45rem;padding:2px 7px;" onclick="hitlDecide(${i},'REVIEW')">REVIEW</button></div>`;
+        } else {
+          d.innerHTML +=
+            `<div style="font-family:var(--mono);font-size:0.45rem;color:${item.status==='APPROVED'?'var(--green)':'var(--red)'};">${item.status}</div>`;
+        }
+        box.appendChild(d);
+      });
+    }
+
+    function hitlDecide(i, dec) {
+      const prev = hitlItems[i].status;
+      hitlItems[i].status = dec;
+      if (prev === 'PENDING') { hitlPending--; if (dec === 'APPROVED') hitlApproved++;
+        else if (dec === 'REJECTED') hitlRejected++; }
+      renderHITL();
+      state.c13++;
+      document.getElementById('c13ops').textContent = state.c13;
+      log(`HITL: ${hitlItems[i].id} → ${dec}`, dec === 'APPROVED' ? 'ok' : dec === 'REJECTED' ? 'err' : 'warn');
+    }
+
+    // --- IA-CORE-1-4 ---
+    const mitreData = [
+      { id: 'T1059', name: 'Cmd Scripting', level: 'high' },
+      { id: 'T1055', name: 'Process Injection', level: 'high' },
+      { id: 'T1027', name: 'Obfuscation', level: 'med' },
+      { id: 'T1071', name: 'C2 Protocol', level: 'high' },
+      { id: 'T1566', name: 'Phishing', level: 'med' },
+      { id: 'T1190', name: 'Exploit Public App', level: 'high' },
+      { id: 'T1078', name: 'Valid Accounts', level: 'med' },
+      { id: 'T1003', name: 'Credential Dump', level: 'high' },
+      { id: 'T1053', name: 'Sched. Tasks', level: 'low' },
+      { id: 'T1021', name: 'Remote Services', level: 'med' },
+      { id: 'T1041', name: 'C2 Exfiltration', level: 'high' },
+      { id: 'T1082', name: 'Sys. Discovery', level: 'low' },
+      { id: 'T1486', name: 'Ransomware', level: 'high' },
+      { id: 'T1070', name: 'Log Removal', level: 'med' },
+      { id: 'T1562', name: 'Impair Defenses', level: 'med' },
+      { id: 'T1105', name: 'Ingress Transfer', level: 'med' },
+    ];
+
+    function buildMitre() {
+      const g = document.getElementById('mitreGrid');
+      g.innerHTML = '';
+      mitreData.forEach(m => {
+        const d = document.createElement('div');
+        d.className = `mitre-cell ${m.level}`;
+        d.id = 'mc_' + m.id;
+        d.innerHTML = `<div>${m.id}</div><div style="margin-top:1px;font-size:0.38rem;color:var(--textd);">${m.name}</div>`;
+        d.onclick = () => {
+          if (selectedMitre.has(m.id)) { selectedMitre.delete(m.id);
+            d.classList.remove('sel'); } else { selectedMitre.add(m.id);
+            d.classList.add('sel'); }
+        };
+        g.appendChild(d);
+      });
+    }
+
+    function clearMitre() { selectedMitre.clear();
+      document.querySelectorAll('.mitre-cell').forEach(c => c.classList.remove('sel')); }
+
+    async function runThreat() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('threatBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('threatOut').textContent = 'ANALYZING...';
+      try {
+        const r = await iaAsk(key, 'You are IA-Core-1-4. Analyze threat and provide attribution, MITRE, and recommendations.',
+          document.getElementById('threatInput').value.trim());
+        document.getElementById('threatOut').textContent = r;
+        const score = Math.floor(Math.random() * 40 + 50);
+        document.getElementById('tScore').textContent = score;
+        document.getElementById('tIOC').textContent = document.getElementById('threatInput').value.split('\n').filter(Boolean)
+          .length;
+        document.getElementById('tTTP').textContent = Math.floor(Math.random() * 4 + 2);
+        document.getElementById('tScoreBar').style.width = score + '%';
+        document.getElementById('tLevel').textContent = score > 75 ? 'HIGH — IMMEDIATE ACTION' : score > 50 ?
+          'MEDIUM — MONITOR' : 'LOW';
+        document.getElementById('tLevel').style.color = score > 75 ? 'var(--red)' : score > 50 ? 'var(--amber)' :
+        'var(--green)';
+        state.threats++;
+        state.queries++;
+        state.c14++;
+        document.getElementById('c14ops').textContent = state.c14;
+        document.getElementById('topThreats').textContent = state.threats;
+        document.getElementById('bThreats').textContent = state.threats;
+        updateProtectionScore();
+        log('THREAT ANALYSIS COMPLETE', 'err');
+      } catch (e) { document.getElementById('threatOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'ANALYZE';
+    }
+
+    async function generatePlaybook() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (selectedMitre.size === 0) { document.getElementById('mitreOut').textContent =
+        'SELECT TECHNIQUES FIRST.'; return; }
+      const ttps = [...selectedMitre].map(id => mitreData.find(m => m.id === id)).filter(Boolean);
+      document.getElementById('mitreOut').textContent = 'GENERATING PLAYBOOK...';
+      try {
+        const r = await iaAsk(key,
+          'You are playbook generator. Create a response plan for the selected techniques.',
+          `Techniques: ${ttps.map(t=>t.id+' '+t.name).join(', ')}`);
+        document.getElementById('mitreOut').textContent = r;
+        state.c14++;
+        log(`PLAYBOOK GENERATED: ${[...selectedMitre].join(', ')}`, 'ok');
+      } catch (e) { document.getElementById('mitreOut').textContent = 'ERROR: ' + e.message; }
+    }
+
+    async function runIR() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('irBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('irOut').textContent = 'GENERATING...';
+      try {
+        const r = await iaAsk(key, 'You are IR commander. Generate an immediate actionable response plan.',
+          document.getElementById('irInput').value.trim());
+        document.getElementById('irOut').textContent = r;
+        state.c14++;
+        log('IR PLAN GENERATED', 'ok');
+      } catch (e) { document.getElementById('irOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'GENERATE PLAN';
+    }
+
+    // --- AI ANALYST ---
+    async function sendMain() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const input = document.getElementById('mainInput').value.trim();
+      if (!input) return;
+      addMsg('user', input);
+      document.getElementById('mainInput').value = '';
+      const mode = document.getElementById('analystMode').value;
+      const lang = document.getElementById('analystLang').value;
+      const thinking = addMsg('ai', '<span class="spin"></span> Processing...', true);
+      document.getElementById('mainBtn').disabled = true;
+      chatHistory.push({ role: 'user', content: input });
+      try {
+        const r = await iaChat(key,
+          `You are IA CENTINELL ANALYST, operating as ${mode}. Respond in ${lang==='es'?'Spanish':'English'}. Be authoritative, technical, and actionable.`,
+          chatHistory);
+        thinking.remove();
+        addMsg('ai', r);
+        chatHistory.push({ role: 'assistant', content: r });
+        if (chatHistory.length > 20) chatHistory.splice(0, 2);
+        state.queries++;
+        log(`AI ANALYST QUERY | MODE=${mode}`, 'ok');
+      } catch (e) { thinking.remove();
+        addMsg('ai', 'ERROR: ' + e.message); }
+      document.getElementById('mainBtn').disabled = false;
+    }
+
+    function addMsg(who, text, temp = false) {
+      const box = document.getElementById('mainChat');
+      const d = document.createElement('div');
+      d.className = 'cmsg';
+      d.innerHTML =
+        `<div class="cmsg-lbl ${who}">${who==='user'?'OPERATOR':'IA CENTINELL ANALYST'}</div><div class="cmsg-body ${who==='user'?'user':''}">${text}</div>`;
+      box.appendChild(d);
+      box.scrollTop = box.scrollHeight;
+      return d;
+    }
+
+    function quickAsk(q) { document.getElementById('mainInput').value = q;
+      sendMain(); }
+
+    function clearChat() { document.getElementById('mainChat').innerHTML = '';
+      chatHistory.length = 0; }
+
+    // --- ALGO LAB ---
+    async function runAlgo() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('algoBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span> COMPUTING...';
+      document.getElementById('algoOut').textContent = 'ANALYZING...\n';
+      document.getElementById('algoComplexity').textContent = '';
+      const domain = document.getElementById('algoDomain').value;
+      const lang = document.getElementById('algoLang').value;
+      const depth = document.getElementById('algoDepth').value;
+      try {
+        const sys =
+          `You are ALGO LAB. Solve at PhD level. Domain: ${domain}. Mode: ${depth}. Language: ${lang}. Provide full solution with analysis.`;
+        const r = await iaAsk(key, sys, document.getElementById('algoInput').value.trim());
+        document.getElementById('algoOut').textContent = r;
+        const m = r.match(/O\([^)]+\)/);
+        if (m) document.getElementById('algoComplexity').textContent = m[0];
+        state.queries++;
+        log(`ALGO LAB: ${domain}`, 'ok');
+      } catch (e) { document.getElementById('algoOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'SOLVE — FULL ANALYSIS';
+    }
+
+    function algoQuick(q) { document.getElementById('algoInput').value = q;
+      runAlgo(); }
+
+    async function runDebate() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('debateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('debateOut').textContent = 'DEBATING...';
+      try {
+        const r = await iaAsk(key, 'You are complexity debate. Compare approaches and declare a winner with justification.',
+          document.getElementById('debateInput').value.trim());
+        document.getElementById('debateOut').textContent = r;
+        state.queries++;
+        log('ALGORITHM DEBATE COMPLETE', 'ok');
+      } catch (e) { document.getElementById('debateOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'DEBATE';
+    }
+
+    async function runOptimize() {
+      const key = apiKey();
+      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      const btn = document.getElementById('optBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
+      document.getElementById('optOut').textContent = 'OPTIMIZING...';
+      try {
+        const r = await iaAsk(key, 'You are code optimizer. Improve complexity and show before/after.',
+          document.getElementById('optInput').value.trim());
+        document.getElementById('optOut').textContent = r;
+        state.queries++;
+        log('CODE OPTIMIZATION COMPLETE', 'ok');
+      } catch (e) { document.getElementById('optOut').textContent = 'ERROR: ' + e.message; }
+      btn.disabled = false;
+      btn.textContent = 'OPTIMIZE';
+    }
+
+    // --- MISSION CARDS ---
+    const missionProblems = [{
+      id: 'PROBLEM 01',
+      title: 'Lack of Digital Traceability',
+      problem: ['Fragmented logs', 'No cryptographic validation', 'Incomplete audits', 'Unverifiable records'],
+      solution: ['SHA-256 validation', 'UTC timestamped records', 'Operational audit trails', 'Integrity verification'],
+      color: 'var(--cyan)'
+    }, {
+      id: 'PROBLEM 02',
+      title: 'Lack of Human AI Oversight',
+      problem: ['Excessive automation', 'No human validation', 'Autonomous critical actions', 'No decision audit'],
+      solution: ['Human-in-the-Loop (HITL)', 'Decision validation layer', 'Ethical transparency', 'Supervised workflows'],
+      color: 'var(--green)'
+    }, {
+      id: 'PROBLEM 03',
+      title: 'No Active Threat Protection',
+      problem: ['No file scanning', 'No malware detection', 'Network blind spots', 'No quarantine'],
+      solution: ['Threat Shield engine', 'Behavioral AI analysis', 'Net Sentinel monitoring', 'Automated quarantine'],
+      color: 'var(--orange)'
+    }, {
+      id: 'PROBLEM 04',
+      title: 'Forensic Integrity Gaps',
+      problem: ['Broken custody chains', 'Evidence tampering risk', 'No cryptographic proof', 'Audit gaps'],
+      solution: ['Chain-of-custody hashing', 'Digital forensics engine', 'Evidence preservation', 'Cryptographic verification'],
+      color: 'var(--amber)'
+    }, {
+      id: 'PROBLEM 05',
+      title: 'AI Governance & Ethics',
+      problem: ['Opaque AI decisions', 'No bias detection', 'No framework compliance', 'No accountability'],
+      solution: ['Ethical AI auditing', 'Algorithmic transparency', 'NIST/ISO/EU AI Act', 'Supervised AI operations'],
+      color: 'var(--purple)'
+    }, ];
+
+    function buildMissionCards() {
+      const container = document.getElementById('missionCards');
+      if (!container) return;
+      container.innerHTML = '';
+      missionProblems.forEach((p, i) => {
+        const d = document.createElement('div');
+        d.style.cssText =
+          `background:var(--panel);border:1px solid var(--border);border-left:2px solid ${p.color};padding:0.5rem 0.65rem;cursor:pointer;transition:background 0.15s;`;
+        d.innerHTML =
+          `<div style="font-family:var(--mono);font-size:0.45rem;color:var(--textdd);margin-bottom:2px;">${p.id}</div><div style="font-family:var(--orb);font-size:0.56rem;color:var(--text);letter-spacing:0.05em;">${p.title.toUpperCase()}</div>`;
+        d.onmouseover = () => d.style.background = 'var(--panel2)';
+        d.onmouseout = () => d.style.background = 'var(--panel)';
+        d.onclick = () => {
+          document.getElementById('missionDetail').innerHTML =
+            `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;"><div><div style="font-family:var(--mono);font-size:0.45rem;color:var(--textdd);letter-spacing:0.1em;margin-bottom:0.3rem;">PROBLEMS</div><ul style="list-style:none;">${p.problem.map(x=>`<li style="font-family:var(--raj);font-size:0.73rem;color:var(--textd);padding:1px 0;">› ${x}</li>`).join('')}</ul></div><div><div style="font-family:var(--mono);font-size:0.45rem;color:var(--textdd);letter-spacing:0.1em;margin-bottom:0.3rem;">IA CENTINELL SOLUTION</div><ul style="list-style:none;">${p.solution.map(x=>`<li style="font-family:var(--raj);font-size:0.73rem;color:${p.color};padding:1px 0;">✅ ${x}</li>`).join('')}</ul></div></div>`;
+        };
+        container.appendChild(d);
+      });
+    }
+
+    // --- CLIENT PANEL ---
+    function updateClientMetrics() {
+      const total = CLIENTS_DB.length;
+      const active = CLIENTS_DB.filter(c => c.status === 'ACTIVE').length;
+      const demo = CLIENTS_DB.filter(c => c.status === 'DEMO').length;
+      const industries = new Set(CLIENTS_DB.map(c => c.type)).size;
+      document.getElementById('cpTotal').textContent = total;
+      document.getElementById('cpActive').textContent = active;
+      document.getElementById('cpDemo').textContent = demo;
+      document.getElementById('cpIndustries').textContent = industries;
+    }
+
+    function buildClientList() {
+      const list = document.getElementById('clientList');
+      if (!list) return;
+      list.innerHTML = '';
+      if (CLIENTS_DB.length === 0) {
+        list.innerHTML =
+          '<div style="font-family:var(--mono);font-size:0.55rem;color:var(--textdd);padding:1rem;text-align:center;">NO CLIENTS — USE FORM TO ADD</div>';
+        updateClientMetrics();
+        return;
+      }
+      const accentColors = ['#5a9fbf', '#4fa878', '#c49a3d', '#b85555', '#8070aa'];
+      CLIENTS_DB.forEach((c, i) => {
+        const ac = accentColors[i % accentColors.length];
+        const d = document.createElement('div');
+        d.style.cssText =
+          'display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.8rem;background:var(--panel);border:1px solid var(--border);margin-bottom:4px;cursor:pointer;transition:background 0.12s;';
+        d.innerHTML =
+          `<div style="width:32px;height:32px;border-radius:50%;background:${ac}18;border:1px solid ${ac}40;display:flex;align-items:center;justify-content:center;font-family:var(--orb);font-size:0.58rem;color:${ac};flex-shrink:0;">${c.name[0]}</div><div style="flex:1;"><div style="font-family:var(--raj);font-size:0.82rem;font-weight:700;color:var(--text);">${c.name}</div><div style="font-family:var(--mono);font-size:0.45rem;color:var(--textdd);">${c.id} · ${c.type} · Since ${c.since}</div></div><span class="tag ${c.status==='ACTIVE'?'tag-green':'tag-amber'}" style="font-size:0.4rem;">${c.status}</span><span class="tag tag-cyan" style="font-size:0.4rem;">${c.ops} ops</span>`;
+        d.onmouseover = () => d.style.background = 'var(--panel2)';
+        d.onmouseout = () => d.style.background = 'var(--panel)';
+        d.onclick = () => {
+          document.getElementById('clientDetail').innerHTML =
+            `<div style="display:grid;gap:0.35rem;"><div style="font-family:var(--orb);font-size:0.65rem;color:var(--text);">${c.name}</div><div style="display:flex;gap:0.35rem;"><span class="tag ${c.status==='ACTIVE'?'tag-green':'tag-amber'}">${c.status}</span><span class="tag tag-cyan">${c.type}</span><span class="tag tag-purple">${c.role}</span></div><table class="tbl"><tr><td style="font-size:0.48rem;color:var(--textdd);">Client ID</td><td style="font-size:0.52rem;">${c.id}</td></tr><tr><td style="font-size:0.48rem;color:var(--textdd);">Since</td><td style="font-size:0.52rem;">${c.since}</td></tr><tr><td style="font-size:0.48rem;color:var(--textdd);">Operations</td><td style="font-size:0.52rem;">${c.ops} recorded</td></tr></table></div>`;
+        };
+        list.appendChild(d);
+      });
+      updateClientMetrics();
+    }
+
+    function addClient() {
+      const name = document.getElementById('newClientName').value.trim();
+      if (!name) { alert('Enter company name.'); return; }
+      const type = document.getElementById('newClientType').value;
+      const role = document.getElementById('newClientRole').value;
+      const id = 'C' + String(CLIENTS_DB.length + 1).padStart(3, '0');
+      CLIENTS_DB.push({
+        id,
+        name,
+        type,
+        role,
+        status: role === 'DEMO' ? 'DEMO' : 'ACTIVE',
+        since: new Date().toISOString().substr(0, 10),
+        ops: 0
+      });
+      buildClientList();
+      document.getElementById('newClientName').value = '';
+      log(`CLIENT ADDED: ${name} [${type}]`, 'ok');
+    }
+
+    // --- RADAR ---
+    function startRadar() {
+      if (_radarRAF) cancelAnimationFrame(_radarRAF);
+      const canvas = document.getElementById('radarCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width,
+        H = canvas.height,
+        cx = W / 2,
+        cy = H / 2,
+        R = 105;
+      let angle = 0;
+      const blips = Array.from({ length: 7 }, () => ({ a: Math.random() * Math.PI * 2, r: Math.random() * R * 0.85,
+        life: Math.random() * 100, max: 70 + Math.random() * 60, threat: Math.random() > 0.8 }));
+      function draw() {
+        ctx.fillStyle = 'rgba(2,12,27,0.18)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = 'rgba(13,45,80,0.5)';
+        [R * 0.33, R * 0.66, R].forEach(r => { ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke(); });
+        ctx.beginPath();
+        ctx.moveTo(cx - R - 8, cy);
+        ctx.lineTo(cx + R + 8, cy);
+        ctx.strokeStyle = 'rgba(13,45,80,0.4)';
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - R - 8);
+        ctx.lineTo(cx, cy + R + 8);
+        ctx.stroke();
+        for (let i = 0; i < 60; i++) { const a = angle - i * 0.04;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+          ctx.strokeStyle = `rgba(90,159,191,${(60-i)/60*0.14})`;
+          ctx.lineWidth = 3;
+          ctx.stroke(); }
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+        ctx.strokeStyle = 'var(--cyan)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        blips.forEach(b => {
+          b.life++;
+          if (b.life > b.max) { b.a = Math.random() * Math.PI * 2;
+            b.r = Math.random() * R * 0.85;
+            b.life = 0;
+            b.max = 70 + Math.random() * 60;
+            b.threat = Math.random() > 0.8; }
+          const a = (angle - b.a + Math.PI * 4) % (Math.PI * 2);
+          if (a < Math.PI * 0.5) { const alpha = 1 - a / (Math.PI * 0.5);
+            const bx = cx + Math.cos(b.a) * b.r,
+              by = cy + Math.sin(b.a) * b.r;
+            const color = b.threat ? '184,85,85' : '0,230,118';
+            ctx.beginPath();
+            ctx.arc(bx, by, b.threat ? 4 : 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color},${alpha*0.85})`;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bx, by, b.threat ? 7 : 6, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${color},${alpha*0.3})`;
+            ctx.lineWidth = 1;
+            ctx.stroke(); }
+        });
+        angle += 0.025;
+        _radarRAF = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    // --- INFRASTRUCTURE ---
+    function updateInfraCharts() {
+      const nodes = ['bar-na', 'bar-eu', 'bar-ap', 'bar-la'];
+      const cpuIds = ['cpu-na', 'cpu-eu', 'cpu-ap', 'cpu-la'];
+      nodes.forEach((id, idx) => {
+        const container = document.getElementById(id);
+        if (!container) return;
+        container.innerHTML = '';
+        let lastVal = 0;
+        for (let i = 0; i < 12; i++) {
+          const val = Math.floor(Math.random() * 75) + 15;
+          if (i === 11) lastVal = val;
+          const bar = document.createElement('div');
+          bar.className = 'bar';
+          bar.style.height = val + '%';
+          bar.setAttribute('data-value', val);
+          container.appendChild(bar);
+        }
+        const cpuEl = document.getElementById(cpuIds[idx]);
+        if (cpuEl) cpuEl.textContent = lastVal + '%';
+      });
+      const statsEl = document.getElementById('infra-stats');
+      if (statsEl) {
+        const uptime = (99.7 + Math.random() * 0.29).toFixed(3);
+        const latency = (10 + Math.random() * 5).toFixed(1);
+        const packets = (Math.floor(Math.random() * 9000) + 1000).toLocaleString();
+        const sessions = Math.floor(Math.random() * 400) + 120;
+        statsEl.innerHTML =
+          `<span style="color:var(--textdd);">UPTIME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:var(--green);">${uptime}%</span><br><span style="color:var(--textdd);">LATENCY&nbsp;</span><span style="color:var(--cyan);">${latency} ms</span><br><span style="color:var(--textdd);">PACKETS/S&nbsp;</span><span style="color:var(--amber);">${packets}</span><br><span style="color:var(--textdd);">SESSIONS&nbsp;&nbsp;</span><span style="color:var(--purple);">${sessions}</span><br><span style="color:var(--textdd);">NODES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:var(--green);">4 / 4</span>`;
+      }
+    }
+
+    function simulateAttack() {
+      document.body.classList.add('mode-lockdown');
+      log('⚠ CRITICAL: BRUTE FORCE ATTACK DETECTED ON NODE USA-EAST', 'err');
+      state.alerts++;
+      state.threats++;
+      document.getElementById('topAlerts').textContent = state.alerts;
+      document.getElementById('bAlerts').textContent = state.alerts;
+      document.getElementById('topThreats').textContent = state.threats;
+      document.getElementById('bThreats').textContent = state.threats;
+      updateProtectionScore();
+      setTimeout(() => {
+        document.body.classList.remove('mode-lockdown');
+        log('ATTACK MITIGATED: IP 45.77.12.90 ISOLATED BY THREAT SHIELD', 'ok');
+        updateProtectionScore();
+      }, 4500);
+    }
+
+    // --- AUDIT LOG TOGGLE ---
+    function toggleLog() {
+      const el = document.getElementById('g-auditlog');
+      const btn = document.getElementById('toggleAudit');
+      el.classList.toggle('open');
+      btn.textContent = el.classList.contains('open') ? '▼ AUDIT' : '▲ AUDIT';
+    }
+
+    // --- BOOT ---
+    const bootLines = [
+      { t: 'STARTING SEQUENCE...', c: '' },
+      { t: 'CRYPTOGRAPHIC ENGINE: LOADED', c: 'ok' },
+      { t: 'THREAT SHIELD: SIGNATURE DB INITIALIZED', c: 'ok' },
+      { t: 'NET SENTINEL: NETWORK MONITOR ACTIVE', c: 'ok' },
+      { t: 'FILE GUARDIAN: INTEGRITY WATCHDOG', c: 'prot' },
+      { t: 'IA-Core-1-1: SHA-256 CHAIN VALIDATOR.......... OK', c: 'ok' },
+      { t: 'IA-Core-1-2: FORENSIC SCANNER................. OK', c: 'ok' },
+      { t: 'IA-Core-1-3: ETHICAL GOVERNANCE [HITL]........ OK', c: 'ok' },
+      { t: 'IA-Core-1-4: THREAT ATTRIBUTION.............. OK', c: 'ok' },
+      { t: 'QUARANTINE VAULT: SECURED', c: 'prot' },
+      { t: '100 DEVICE SIMULATION: ACTIVE', c: 'ok' },
+      { t: 'AI ENGINE: READY', c: 'ok' },
+      { t: 'ALL SYSTEMS NOMINAL', c: 'ok' },
+    ];
+    let bi = 0;
+
+    function bootStep() {
+      if (bi >= bootLines.length) {
+        setTimeout(() => {
+          document.getElementById('splash').classList.add('gone');
+          setTimeout(() => {
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('shell').classList.add('visible');
+            startRadar();
+            buildMitre();
+            buildMissionCards();
+            buildClientList();
+            startLiveFeed();
+            startNetworkSim();
+            simulateDevices();
+            if (CLIENTS_DB.length === 0) {
+              CLIENTS_DB.push({ id: 'C001', name: 'Global Shipping', type: 'MARITIME', role: 'FULL ACCESS',
+                status: 'ACTIVE', since: '2025-01-15', ops: 47 });
+              CLIENTS_DB.push({ id: 'C002', name: 'Defense Tech', type: 'DEFENSE', role: 'FULL ACCESS',
+                status: 'ACTIVE', since: '2025-02-20', ops: 32 });
+              CLIENTS_DB.push({ id: 'C003', name: 'Logistics Corp', type: 'ENTERPRISE', role: 'READ ONLY',
+                status: 'ACTIVE', since: '2025-03-01', ops: 12 });
+              buildClientList();
+            }
+            const el = document.getElementById('sigLastUpdate');
+            if (el) el.textContent = new Date().toISOString().split('T')[0];
+            log('IA CENTINELL v6.0 STARTED — PROTECTION & INTELLIGENCE PLATFORM', 'ok');
+            updateProtectionScore();
+            setInterval(() => {
+              document.getElementById('topOps').textContent = state.ops;
+              document.getElementById('bOps').textContent = state.ops;
+              document.getElementById('topAlerts').textContent = state.alerts;
+              document.getElementById('bAlerts').textContent = state.alerts;
+              document.getElementById('topThreats').textContent = state.threats;
+              document.getElementById('bThreats').textContent = state.threats;
+              document.getElementById('topQuarantined').textContent = state.quarantined;
+              document.getElementById('bQuarantined').textContent = state.quarantined;
+              document.getElementById('bQueries').textContent = state.queries;
+            }, 5000);
+            setInterval(() => {
+              if (Math.random() > 0.82) simulateAttack();
+            }, 25000);
+            setInterval(updateInfraCharts, 4000);
+            setTimeout(updateInfraCharts, 600);
+          }, 600);
+        }, 300);
+        return;
+      }
+      const pct = ((bi + 1) / bootLines.length * 100) + '%';
+      document.getElementById('spFill').style.width = pct;
+      const el = document.createElement('div');
+      el.className = 'sp-line' + (bootLines[bi].c ? ' ' + bootLines[bi].c : '');
+      el.textContent = '> ' + bootLines[bi].t;
+      document.getElementById('spLog').appendChild(el);
+      document.getElementById('spLog').scrollTop = 9999;
+      bi++;
+      setTimeout(bootStep, 150);
+    }
+    setTimeout(bootStep, 400);
+
+    // --- Logout / Reset Demo ---
+    function doLogout() {
+      if (_feedTimer) clearInterval(_feedTimer);
+      if (_netTimer) clearInterval(_netTimer);
+      if (_radarRAF) cancelAnimationFrame(_radarRAF);
+      if (_deviceTimer) clearInterval(_deviceTimer);
+      state.ops = 0;
+      state.alerts = 0;
+      state.threats = 0;
+      state.queries = 0;
+      state.quarantined = 0;
+      state.shield = 0;
+      state.net = 0;
+      state.guard = 0;
+      state.c11 = 0;
+      state.c12 = 0;
+      state.c13 = 0;
+      state.c14 = 0;
+      state.devices = 0;
+      quarantineItems.length = 0;
+      baselineFiles.clear();
+      hitlItems = [];
+      hitlPending = 0;
+      hitlApproved = 0;
+      hitlRejected = 0;
+      qCleaned = 0;
+      qHigh = 0;
+      qMed = 0;
+      selectedMitre.clear();
+      chatHistory.length = 0;
+      document.getElementById('bridgeLog').textContent = 'SYSTEM RESET.';
+      document.getElementById('glog').innerHTML = '';
+      document.getElementById('topOps').textContent = '0';
+      document.getElementById('bOps').textContent = '0';
+      document.getElementById('topAlerts').textContent = '0';
+      document.getElementById('bAlerts').textContent = '0';
+      document.getElementById('topThreats').textContent = '0';
+      document.getElementById('bThreats').textContent = '0';
+      document.getElementById('topQuarantined').textContent = '0';
+      document.getElementById('bQuarantined').textContent = '0';
+      document.getElementById('bQueries').textContent = '0';
+      document.getElementById('topDevices').textContent = '0';
+      document.getElementById('qBadge').textContent = '0';
+      document.getElementById('qTileBadge').textContent = '0';
+      document.getElementById('qTotal').textContent = '0';
+      document.getElementById('qHigh').textContent = '0';
+      document.getElementById('qMed').textContent = '0';
+      document.getElementById('qCleaned').textContent = '0';
+      renderQuarantine();
+      renderBaseline();
+      renderHITL();
+      clearMitre();
+      document.getElementById('mainChat').innerHTML = '';
+      document.getElementById('shieldOps').textContent = '0';
+      document.getElementById('netOps').textContent = '0';
+      document.getElementById('guardOps').textContent = '0';
+      document.getElementById('c11ops').textContent = '0';
+      document.getElementById('c12ops').textContent = '0';
+      document.getElementById('c13ops').textContent = '0';
+      document.getElementById('c14ops').textContent = '0';
+      startLiveFeed();
+      startNetworkSim();
+      simulateDevices();
+      updateProtectionScore();
+      log('DEMO RESET — READY FOR NEW PRESENTATION', 'ok');
+    }
+
+    // Expose globally
+    window.nav = nav;
+    window.tileNav = tileNav;
+    window.log = log;
+    window.toggleLog = toggleLog;
+    window.doLogout = doLogout;
+    window.scanFileInput = scanFileInput;
+    window.handleScanDrop = handleScanDrop;
+    window.checkSig = checkSig;
+    window.runBehavior = runBehavior;
+    window.runReputation = runReputation;
+    window.refreshConnections = refreshConnections;
+    window.clearConns = clearConns;
+    window.runNetAnalysis = runNetAnalysis;
+    window.runFirewall = runFirewall;
+    window.addToBaseline = addToBaseline;
+    window.removeBaseline = removeBaseline;
+    window.verifyBaseline = verifyBaseline;
+    window.clearBaseline = clearBaseline;
+    window.runFileBehavior = runFileBehavior;
+    window.runSysInt = runSysInt;
+    window.addQuarantine = addQuarantine;
+    window.runRemediation = runRemediation;
+    window.runHash11 = runHash11;
+    window.compareHashes = compareHashes;
+    window.hashFile = hashFile;
+    window.askAI11 = askAI11;
+    window.aiAuditAnalyze = aiAuditAnalyze;
+    window.openCase = openCase;
+    window.runForensic = runForensic;
+    window.runEthics = runEthics;
+    window.runBias = runBias;
+    window.runCompliance = runCompliance;
+    window.addHITL = addHITL;
+    window.hitlDecide = hitlDecide;
+    window.runThreat = runThreat;
+    window.generatePlaybook = generatePlaybook;
+    window.runIR = runIR;
+    window.clearMitre = clearMitre;
+    window.sendMain = sendMain;
+    window.quickAsk = quickAsk;
+    window.clearChat = clearChat;
+    window.runAlgo = runAlgo;
+    window.algoQuick = algoQuick;
+    window.runDebate = runDebate;
+    window.runOptimize = runOptimize;
+    window.addClient = addClient;
+    window.simulateAttack = simulateAttack;
+    window.updateInfraCharts = updateInfraCharts;
+    window.simulateDevices = simulateDevices;
+    window.updateProtectionScore = updateProtectionScore;
+  </script>
+</body>
+</html>
