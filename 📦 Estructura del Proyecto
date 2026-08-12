@@ -1,0 +1,21 @@
+/ia-centinell
+├── README.md                 # Este documento
+├── package.json              # Dependencias y scripts
+├── .env.example              # Variables de entorno
+├── server.js                 # Servidor Express
+├── public/
+│   └── index.html            # Frontend completo
+├── routes/
+│   ├── auth.js               # Autenticación
+│   ├── shield.js             # Threat Shield
+│   ├── net.js                # Net Sentinel
+│   ├── guardian.js           # File Guardian
+│   ├── quarantine.js         # Cuarentena
+│   ├── ia-core.js            # IA-CORE-1-1 a 1-4
+│   ├── analyst.js            # AI Analyst
+│   ├── algo.js               # Algo Lab
+│   ├── clients.js            # Gestión de clientes
+│   └── infra.js              # Infraestructura
+└── middleware/
+    ├── auth.js               # Verificación JWT
+    └── upload.js             # Multer para archivos
