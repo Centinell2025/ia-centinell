@@ -1501,8 +1501,8 @@
         <span class="sb-prot-lbl" id="sbProtLbl">PROTECTED</span>
       </div>
       <div class="sb-apirow">
-        <div class="sb-api-lbl">IA CENTINELL ENGINE KEY</div>
-        <input type="password" id="globalKey" placeholder="IACK-..." value="demo-key-for-sales">
+        <div class="sb-api-lbl">AI PROVIDER: NOT CONFIGURED</div>
+        <p style="font-size:12px;color:var(--amber)">Local demo. Do not enter provider keys here.</p>
       </div>
       <nav class="sb-nav">
         <div class="nav-group">COMMAND</div>
@@ -1553,6 +1553,7 @@
           <div class="tb-user" id="topUser">DEMO</div>
         </div>
       </div>
+      <div role="status" style="background:#382800;color:#ffe6a0;padding:8px;font:14px sans-serif">DEMO ONLY · Device, protection, threat, client and infrastructure data are simulated. No live monitoring or actual file quarantine. AI unavailable. Browser data resets on reload.</div>
       <div id="liveFeed">
         <span><span class="feed-ok">▶</span> <span id="feedTxt">IA CENTINELL PROTECTION ENGINE ACTIVE — 100 DEVICES SIMULATED</span></span>
       </div>
@@ -2504,7 +2505,7 @@
       const ts = new Date().toISOString().substr(11, 19);
       const el = document.createElement('div');
       el.innerHTML =
-        `<span style="color:var(--textdd)">[${ts}]</span> <span style="color:${type==='err'?'var(--red)':type==='warn'?'var(--amber)':type==='ok'?'var(--green)':'var(--cyan2)'}">${msg}</span>`;
+        `<span style="color:var(--textdd)">[${ts}]</span> <span style="color:${type==='err'?'var(--red)':type==='warn'?'var(--amber)':type==='ok'?'var(--green)':'var(--cyan2)'}">${escapeHtml(msg)}</span>`;
       document.getElementById('glog').appendChild(el);
       document.getElementById('glog').scrollTop = 9999;
       const bl = document.getElementById('bridgeLog');
@@ -2515,53 +2516,20 @@
     }
 
     function sha256(str) {
-      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+      const bytes = typeof str === "string" ? new TextEncoder().encode(str) : str;
+      return crypto.subtle.digest('SHA-256', bytes)
         .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
     }
 
-    function apiKey() { return document.getElementById('globalKey').value.trim() || 'demo-key'; }
-
-    // --- AI (Claude) ---
-    async function iaAsk(key, system, userMsg) {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system,
-          messages: [{ role: 'user', content: userMsg }]
-        })
-      });
-      const d = await r.json();
-      if (d.error) throw new Error(d.error.message);
-      return d.content?.[0]?.text || '';
+    function apiKey() { return 'demo-key'; }
+    const AI_UNAVAILABLE = 'AI unavailable: no server-side provider is configured. No analysis was performed.';
+    async function iaAsk() { throw new Error(AI_UNAVAILABLE); }
+    async function iaChat() { throw new Error(AI_UNAVAILABLE); }
+    async function runRemediation() {
+      document.getElementById('remOut').textContent = AI_UNAVAILABLE;
     }
-
-    async function iaChat(key, system, messages) {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system,
-          messages
-        })
-      });
-      const d = await r.json();
-      if (d.error) throw new Error(d.error.message);
-      return d.content?.[0]?.text || '';
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
     // --- Navigation ---
@@ -2584,25 +2552,16 @@
     };
 
     function nav(id) {
-      if (id === _currentPage) return;
-      const oldPage = document.getElementById('page-' + _currentPage);
       const newPage = document.getElementById('page-' + id);
       if (!newPage) return;
-      if (oldPage) {
-        oldPage.classList.add('exit-anim');
-        setTimeout(() => { oldPage.classList.remove('active', 'exit-anim'); }, 150);
-      }
-      setTimeout(() => {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        newPage.classList.add('active');
-        document.getElementById('tbPage').textContent = pageNames[id] || id;
-        document.querySelectorAll('.nav-item').forEach(n => {
-          n.classList.remove('active');
-          if (n.getAttribute('onclick') === `nav('${id}')`) n.classList.add('active');
-        });
-        _currentPage = id;
-        document.getElementById('content').scrollTop = 0;
-      }, 160);
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'exit-anim'));
+      newPage.classList.add('active');
+      document.getElementById('tbPage').textContent = pageNames[id] || id;
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.toggle('active', n.getAttribute('onclick') === `nav('${id}')`);
+      });
+      _currentPage = id;
+      document.getElementById('content').scrollTop = 0;
     }
 
     function tileNav(id, el) {
@@ -2716,11 +2675,9 @@
     }
 
     // --- THREAT SHIELD ---
+    // Only the harmless EICAR test string is recognized; this is not an antivirus engine.
     const KNOWN_SIGS = {
-      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'EICAR Test File (Harmless)',
-      'a3f5d2c9b1e8f4a7d6c3b2e1f9a8d7c6b5e4f3a2d1c0b9e8f7a6d5c4b3e2f1': 'Trojan.GenericKD.71234',
-      'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592': 'Ransomware.WannaCry.variant',
-      '2c624232cdd221771294dfbb310acbc5864efebcb3fa0e2e2e5e6b7c2c4a1e3': 'Backdoor.Generic.malware',
+      '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f': 'EICAR test signature (not live malware)',
     };
 
     function auto_quarantine(name, type, risk) {
@@ -2780,9 +2737,9 @@
         d.onclick = () => showQDetail(i);
         d.innerHTML = `
           <span style="font-size:1.1rem;">${item.status==='CLEANED'?'✅':'🔒'}</span>
-          <div class="qrow-name">${item.name}</div>
+          <div class="qrow-name">${escapeHtml(item.name)}</div>
           <span class="tag ${item.risk==='HIGH'?'tag-red':item.risk==='MEDIUM'?'tag-amber':'tag-green'}" style="font-size:0.4rem;">${item.risk}</span>
-          <div class="qrow-type">${item.type}</div>
+          <div class="qrow-type">${escapeHtml(item.type)}</div>
           <div class="qrow-ts">${item.ts.substr(11,8)}</div>
         `;
         if (item.status === 'QUARANTINED') {
@@ -2799,10 +2756,10 @@
       const item = quarantineItems[i];
       document.getElementById('qDetail').innerHTML = `
         <div style="display:grid;gap:0.4rem;">
-          <div style="font-family:var(--orb);font-size:0.6rem;color:var(--red);">${item.name}</div>
+          <div style="font-family:var(--orb);font-size:0.6rem;color:var(--red);">${escapeHtml(item.name)}</div>
           <div style="display:flex;gap:0.4rem;">
             <span class="tag tag-${item.risk==='HIGH'?'red':item.risk==='MEDIUM'?'amber':'green'}">${item.risk} RISK</span>
-            <span class="tag tag-amber">${item.type}</span>
+            <span class="tag tag-amber">${escapeHtml(item.type)}</span>
             <span class="tag ${item.status==='CLEANED'?'tag-green':'tag-red'}">${item.status}</span>
           </div>
           <table class="tbl">
@@ -2868,7 +2825,7 @@
         icon.textContent = '🚨';
         auto_quarantine(file.name, sig || 'Unknown Malware', 'HIGH');
       } else {
-        verdict.textContent = '✅ CLEAN';
+        verdict.textContent = 'NO TEST SIGNATURE MATCH — NOT A SAFETY VERDICT';
         verdict.className = 'tag tag-green';
         icon.textContent = '✅';
       }
@@ -2884,7 +2841,7 @@
       } else {
         document.getElementById('scanAnalysis').textContent = (isMalicious ? '⚠ THREAT DETECTED: ' + sig :
             '✅ SHA-256: ' + hash + '\n✅ No known signatures.') +
-          '\n\nEnter AI key for deep analysis.';
+          '\n\nAI unavailable: no provider configured. Signature-only test; no behavioral analysis.';
       }
       state.shield++;
       document.getElementById('shieldOps').textContent = state.shield;
@@ -2903,7 +2860,6 @@
 
     async function runBehavior() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key to use the analyzer.'); return; }
       const btn = document.getElementById('behaviorBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -2928,7 +2884,6 @@
 
     async function runReputation() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('reputBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -2988,7 +2943,6 @@
 
     async function runNetAnalysis() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('netBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3006,7 +2960,6 @@
 
     async function runFirewall() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('fwBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3044,7 +2997,8 @@
         d.style.cssText =
           'display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.5rem;background:#020c1b;border:1px solid var(--border);margin-bottom:3px;';
         d.innerHTML =
-          `<span style="font-size:0.9rem;">${v.lastVerified?'✅':'📄'}</span><div style="flex:1;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--text);">${name}</div><div style="font-family:var(--mono);font-size:0.44rem;color:var(--textdd);">${v.hash.substr(0,20)}... | ${(v.size/1024).toFixed(1)}KB</div></div><button onclick="removeBaseline('${name}')" style="font-family:var(--mono);font-size:0.4rem;background:transparent;border:1px solid var(--border2);color:var(--textdd);cursor:pointer;padding:1px 4px;">✕</button>`;
+          `<span style="font-size:0.9rem;">${v.lastVerified?'✅':'📄'}</span><div style="flex:1;"><div style="font-family:var(--mono);font-size:0.52rem;color:var(--text);">${escapeHtml(name)}</div><div style="font-family:var(--mono);font-size:0.44rem;color:var(--textdd);">${v.hash.substr(0,20)}... | ${(v.size/1024).toFixed(1)}KB</div></div><button class="remove-baseline" style="font-family:var(--mono);font-size:0.4rem;background:transparent;border:1px solid var(--border2);color:var(--textdd);cursor:pointer;padding:1px 4px;">✕</button>`;
+        d.querySelector('.remove-baseline').onclick = () => removeBaseline(name);
         list.appendChild(d);
       });
     }
@@ -3054,16 +3008,24 @@
       document.getElementById('baselineCount').textContent = baselineFiles.size; }
 
     async function verifyBaseline() {
-      if (baselineFiles.size === 0) { document.getElementById('changeLog').textContent = 'NO FILES IN BASELINE.'; return; }
       const logEl = document.getElementById('changeLog');
-      logEl.textContent = 'VERIFYING INTEGRITY...\n';
-      baselineFiles.forEach((v, name) => {
-        v.lastVerified = new Date().toISOString();
-        logEl.textContent += `✅ ${name}: HASH VERIFIED — ${v.hash.substr(0,16)}...\n`;
-      });
-      logEl.textContent += 'ALL FILES VERIFIED — BASELINE INTACT.';
-      renderBaseline();
-      log('FILE GUARDIAN: VERIFICATION COMPLETE', 'ok');
+      if (!baselineFiles.size) { logEl.textContent = 'NO FILES IN BASELINE.'; return; }
+      logEl.textContent = 'Select the current files to compare their bytes with the stored baseline.';
+      const picker = document.createElement('input');
+      picker.type = 'file'; picker.multiple = true;
+      picker.onchange = async () => {
+        logEl.textContent = '';
+        for (const file of picker.files) {
+          const original = baselineFiles.get(file.name);
+          if (!original) { logEl.textContent += file.name + ': NO BASELINE\n'; continue; }
+          const current = await sha256(await file.arrayBuffer());
+          const matches = current === original.hash;
+          original.lastVerified = matches ? new Date().toISOString() : null;
+          logEl.textContent += file.name + (matches ? ': MATCH\n' : ': CHANGED\n');
+        }
+        renderBaseline();
+      };
+      picker.click();
     }
 
     function clearBaseline() { baselineFiles.clear();
@@ -3072,7 +3034,6 @@
 
     async function runFileBehavior() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('fileBehaviorBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3092,7 +3053,6 @@
 
     async function runSysInt() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('sysIntBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3149,7 +3109,6 @@
 
     async function askAI11() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const q = document.getElementById('ai11q').value.trim() || `Analyze the hash: ${document.getElementById('h11hash').textContent}`;
       const btn = document.getElementById('ai11btn');
       btn.disabled = true;
@@ -3217,7 +3176,6 @@
 
     async function runForensic() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('forensicBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3238,7 +3196,6 @@
     // --- IA-CORE-1-3 ---
     async function runEthics() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('ethicsBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3258,7 +3215,6 @@
 
     async function runBias() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('biasBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3280,7 +3236,6 @@
 
     async function runCompliance() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const fws = [];
       if (document.getElementById('chk_nist').checked) fws.push('NIST CSF 2.0');
       if (document.getElementById('chk_iso').checked) fws.push('ISO/IEC 42001');
@@ -3401,7 +3356,6 @@
 
     async function runThreat() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('threatBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3435,7 +3389,6 @@
 
     async function generatePlaybook() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       if (selectedMitre.size === 0) { document.getElementById('mitreOut').textContent =
         'SELECT TECHNIQUES FIRST.'; return; }
       const ttps = [...selectedMitre].map(id => mitreData.find(m => m.id === id)).filter(Boolean);
@@ -3452,7 +3405,6 @@
 
     async function runIR() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('irBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3471,7 +3423,6 @@
     // --- AI ANALYST ---
     async function sendMain() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const input = document.getElementById('mainInput').value.trim();
       if (!input) return;
       addMsg('user', input);
@@ -3501,7 +3452,7 @@
       const d = document.createElement('div');
       d.className = 'cmsg';
       d.innerHTML =
-        `<div class="cmsg-lbl ${who}">${who==='user'?'OPERATOR':'IA CENTINELL ANALYST'}</div><div class="cmsg-body ${who==='user'?'user':''}">${text}</div>`;
+        `<div class="cmsg-lbl ${who}">${who==='user'?'OPERATOR':'IA CENTINELL ANALYST'}</div><div class="cmsg-body ${who==='user'?'user':''}">${escapeHtml(text)}</div>`;
       box.appendChild(d);
       box.scrollTop = box.scrollHeight;
       return d;
@@ -3516,7 +3467,6 @@
     // --- ALGO LAB ---
     async function runAlgo() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('algoBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span> COMPUTING...';
@@ -3544,7 +3494,6 @@
 
     async function runDebate() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('debateBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3562,7 +3511,6 @@
 
     async function runOptimize() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('optBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3833,7 +3781,7 @@
       { t: 'IA-Core-1-4: THREAT ATTRIBUTION.............. OK', c: 'ok' },
       { t: 'QUARANTINE VAULT: SECURED', c: 'prot' },
       { t: '100 DEVICE SIMULATION: ACTIVE', c: 'ok' },
-      { t: 'AI ENGINE: READY', c: 'ok' },
+      { t: 'AI ENGINE: UNAVAILABLE — NO PROVIDER CONFIGURED', c: 'ok' },
       { t: 'ALL SYSTEMS NOMINAL', c: 'ok' },
     ];
     let bi = 0;
@@ -3898,71 +3846,7 @@
     setTimeout(bootStep, 400);
 
     // --- Logout / Reset Demo ---
-    function doLogout() {
-      if (_feedTimer) clearInterval(_feedTimer);
-      if (_netTimer) clearInterval(_netTimer);
-      if (_radarRAF) cancelAnimationFrame(_radarRAF);
-      if (_deviceTimer) clearInterval(_deviceTimer);
-      state.ops = 0;
-      state.alerts = 0;
-      state.threats = 0;
-      state.queries = 0;
-      state.quarantined = 0;
-      state.shield = 0;
-      state.net = 0;
-      state.guard = 0;
-      state.c11 = 0;
-      state.c12 = 0;
-      state.c13 = 0;
-      state.c14 = 0;
-      state.devices = 0;
-      quarantineItems.length = 0;
-      baselineFiles.clear();
-      hitlItems = [];
-      hitlPending = 0;
-      hitlApproved = 0;
-      hitlRejected = 0;
-      qCleaned = 0;
-      qHigh = 0;
-      qMed = 0;
-      selectedMitre.clear();
-      chatHistory.length = 0;
-      document.getElementById('bridgeLog').textContent = 'SYSTEM RESET.';
-      document.getElementById('glog').innerHTML = '';
-      document.getElementById('topOps').textContent = '0';
-      document.getElementById('bOps').textContent = '0';
-      document.getElementById('topAlerts').textContent = '0';
-      document.getElementById('bAlerts').textContent = '0';
-      document.getElementById('topThreats').textContent = '0';
-      document.getElementById('bThreats').textContent = '0';
-      document.getElementById('topQuarantined').textContent = '0';
-      document.getElementById('bQuarantined').textContent = '0';
-      document.getElementById('bQueries').textContent = '0';
-      document.getElementById('topDevices').textContent = '0';
-      document.getElementById('qBadge').textContent = '0';
-      document.getElementById('qTileBadge').textContent = '0';
-      document.getElementById('qTotal').textContent = '0';
-      document.getElementById('qHigh').textContent = '0';
-      document.getElementById('qMed').textContent = '0';
-      document.getElementById('qCleaned').textContent = '0';
-      renderQuarantine();
-      renderBaseline();
-      renderHITL();
-      clearMitre();
-      document.getElementById('mainChat').innerHTML = '';
-      document.getElementById('shieldOps').textContent = '0';
-      document.getElementById('netOps').textContent = '0';
-      document.getElementById('guardOps').textContent = '0';
-      document.getElementById('c11ops').textContent = '0';
-      document.getElementById('c12ops').textContent = '0';
-      document.getElementById('c13ops').textContent = '0';
-      document.getElementById('c14ops').textContent = '0';
-      startLiveFeed();
-      startNetworkSim();
-      simulateDevices();
-      updateProtectionScore();
-      log('DEMO RESET — READY FOR NEW PRESENTATION', 'ok');
-    }
+    function doLogout() { window.location.reload(); }
 
     // Expose globally
     window.nav = nav;
@@ -4018,3 +3902,4 @@
   </script>
 </body>
 </html>
+

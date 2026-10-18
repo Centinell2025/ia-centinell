@@ -10,12 +10,22 @@ const { v4: uuidv4 } = require('uuid');
 // --- Inicialización ---
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Isolated demo sessions use an ephemeral secret, never a committed credential.
+const jwtSecret = process.env.JWT_SECRET || require('crypto').randomBytes(32).toString('hex');
 
 // --- Middleware ---
-app.use(cors());
+// Same-origin local demonstration, not a deployed service.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', mode: 'demo', ai: 'unavailable', persistence: 'memory' }));
+app.use('/api', (req, res, next) => {
+  res.set('X-Centinell-Mode', 'simulated');
+  const send = res.json.bind(res);
+  res.json = data => send(Array.isArray(data) ? data : { ...data, mode: 'simulated' });
+  next();
+});
+const unavailable = (req, res) => res.status(503).json({ error: 'AI provider not configured; no analysis performed', available: false });
+app.post(['/api/shield/behavior', '/api/net/anomaly', '/api/ia-core/forensic', '/api/ia-core/ethics', '/api/ia-core/threat', '/api/analyst/query', '/api/algo/solve'], unavailable);
 
 // --- Simulación de BD en memoria ---
 const db = {
@@ -25,15 +35,12 @@ const db = {
   baseline: [],
   hitl: [],
   logs: [],
-  threatSignatures: [
-    { hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', name: 'EICAR Test File' },
-    { hash: 'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592', name: 'Ransomware.WannaCry' }
-  ]
+  threatSignatures: [{ hash: '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f', name: 'EICAR test signature (not live malware)' }]
 };
 
 // --- Utilidades ---
 function generateToken(user) {
-  return jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign({ id: user.id, email: user.email, role: user.role }, jwtSecret, { expiresIn: '24h' });
 }
 
 function verifyToken(req, res, next) {
@@ -41,7 +48,7 @@ function verifyToken(req, res, next) {
   if (!authHeader) return res.status(401).json({ error: 'No token provided' });
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;
     next();
   } catch (err) {
@@ -56,7 +63,7 @@ const upload = multer({ storage: storage, limits: { fileSize: 10 * 1024 * 1024 }
 // --- Rutas de autenticación ---
 app.post('/api/auth/register', async (req, res) => {
   const { email, password, name, company } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password || password.length > 256) return res.status(400).json({ error: 'Email and password required' });
   const existing = db.users.find(u => u.email === email);
   if (existing) return res.status(409).json({ error: 'User already exists' });
   const hashed = await bcrypt.hash(password, 10);
@@ -68,6 +75,7 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
+  if (typeof email !== 'string' || typeof password !== 'string' || !password || password.length > 256) return res.status(400).json({ error: 'Email and password required' });
   const user = db.users.find(u => u.email === email);
   if (!user) return res.status(401).json({ error: 'Invalid credentials' });
   const valid = await bcrypt.compare(password, user.password);
@@ -109,7 +117,7 @@ app.post('/api/shield/scan', verifyToken, upload.single('file'), async (req, res
     hash,
     isMalicious,
     signature: signature ? signature.name : null,
-    verdict: isMalicious ? 'THREAT_DETECTED' : 'CLEAN',
+    verdict: isMalicious ? 'TEST_SIGNATURE_MATCH' : 'NO_TEST_SIGNATURE_MATCH',
     timestamp: new Date()
   };
   // Si es malicioso, añadir a cuarentena
@@ -158,7 +166,7 @@ app.post('/api/guardian/baseline', verifyToken, upload.single('file'), (req, res
 
 app.get('/api/guardian/verify', verifyToken, (req, res) => {
   // Simular verificación
-  const verified = db.baseline.map(f => ({ ...f, status: 'OK' }));
+  const verified = db.baseline.map(f => ({ ...f, status: 'NOT_REVERIFIED' }));
   res.json({ baseline: verified });
 });
 
@@ -251,12 +259,16 @@ app.get('/api/infra/nodes', verifyToken, (req, res) => {
 });
 
 // --- Ruta principal para servir el frontend ---
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.use('/api', (req, res) => res.status(404).json({ error: 'API route not found' }));
+app.get(['/', '/index.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // --- Iniciar servidor ---
-app.listen(PORT, () => {
+if (require.main === module) app.listen(PORT, '127.0.0.1', () => {
   console.log(`🚀 IA CENTINELL Server running on http://localhost:${PORT}`);
   console.log(`📡 API ready for frontend integration.`);
 });
+
+
+module.exports = app;
