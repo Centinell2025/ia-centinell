@@ -63,3 +63,50 @@ test('file scan uses bytes; baseline labels need fresh selection and filenames a
  w.document.querySelector('.remove-baseline').click();assert.equal(w.document.getElementById('baselineCount').textContent,'0');assert.deepEqual(errors,[]);
  } finally {dom.window.close();}
 });
+
+test('overlapping scans preserve the newest file, hash, verdict and operation count', async () => {
+ const {dom,w}=dashboard();try {
+ let resolveA;const a=w.processFileScan({name:'a.txt',size:1,lastModified:0,arrayBuffer:()=>new Promise(r=>resolveA=r)});
+ const bBytes=new TextEncoder().encode('b');
+ await w.processFileScan({name:'b.txt',size:1,lastModified:0,arrayBuffer:async()=>bBytes.buffer});
+ resolveA(new TextEncoder().encode('a').buffer);await a;
+ assert.equal(w.document.getElementById('scanFileName').textContent,'b.txt');
+ assert.equal(w.document.getElementById('scanHash').textContent,createHash('sha256').update('b').digest('hex'));
+ assert.equal(w.document.getElementById('shieldOps').textContent,'1');
+ let rejectOld;const old=w.processFileScan({name:'old.txt',size:1,lastModified:0,arrayBuffer:()=>new Promise((_,r)=>rejectOld=r)});
+ assert.equal(w.document.getElementById('scanHash').textContent,'');assert.equal(w.document.getElementById('scanVerdict').textContent,'SCANNING');
+ await w.processFileScan({name:'new.txt',size:1,lastModified:0,arrayBuffer:async()=>bBytes.buffer});rejectOld(new Error('old read failed'));await old;
+ assert.equal(w.document.getElementById('scanFileName').textContent,'new.txt');assert.match(w.document.getElementById('scanVerdict').textContent,/NOT A SAFETY VERDICT/);
+ await w.processFileScan({name:'bad.txt',size:1,lastModified:0,arrayBuffer:async()=>{throw Error('unreadable');}});assert.equal(w.document.getElementById('scanHash').textContent,'');assert.match(w.document.getElementById('scanVerdict').textContent,/SCAN FAILED/);
+ } finally {dom.window.close();}
+});
+test('overlapping file hashes are latest-wins per output, including late read failures', async () => {
+ const {dom,w}=dashboard();try {
+ for(const id of ['testHash','testInfo','secondHash','secondInfo']) {const el=w.document.createElement('div');el.id=id;w.document.body.appendChild(el);}
+ const makeFile=(name,read)=>({name,size:1,arrayBuffer:read});let resolveA;
+ const a=w.hashFile({files:[makeFile('a.txt',()=>new Promise(r=>resolveA=r))]},'testHash','testInfo');
+ const bytes=new TextEncoder().encode('b');
+ await w.hashFile({files:[makeFile('b.txt',async()=>bytes.buffer)]},'testHash','testInfo');
+ await w.hashFile({files:[makeFile('other.txt',async()=>new TextEncoder().encode('c').buffer)]},'secondHash','secondInfo');
+ resolveA(new TextEncoder().encode('a').buffer);await a;
+ assert.match(w.document.getElementById('testInfo').textContent,/b.txt/);assert.equal(w.document.getElementById('testHash').textContent,'SHA-256: '+createHash('sha256').update('b').digest('hex'));
+ assert.equal(w.document.getElementById('secondHash').textContent,'SHA-256: '+createHash('sha256').update('c').digest('hex'));
+ let rejectA;const old=w.hashFile({files:[makeFile('old.txt',()=>new Promise((_,r)=>rejectA=r))]},'testHash','testInfo');
+ assert.equal(w.document.getElementById('testHash').textContent,'COMPUTING SHA-256...');
+ await w.hashFile({files:[makeFile('new.txt',async()=>bytes.buffer)]},'testHash','testInfo');rejectA(Error('old read failed'));await old;
+ assert.match(w.document.getElementById('testInfo').textContent,/new.txt/);assert.equal(w.document.getElementById('testHash').textContent,'SHA-256: '+createHash('sha256').update('b').digest('hex'));
+ } finally {dom.window.close();}
+});
+test('late digest completions cannot replace newer scan or hash results', async () => {
+ const {dom,w}=dashboard();try {
+ let pending=[];w.sha256=()=>new Promise(resolve=>pending.push(resolve));
+ const file=name=>({name,size:1,lastModified:0,arrayBuffer:async()=>new ArrayBuffer(1)});
+ const a=w.processFileScan(file('a.txt'));await new Promise(setImmediate);const resolveA=pending.shift();
+ const b=w.processFileScan(file('b.txt'));await new Promise(setImmediate);pending.shift()('hash-b');await b;resolveA('hash-a');await a;
+ assert.equal(w.document.getElementById('scanHash').textContent,'hash-b');assert.equal(w.document.getElementById('scanFileName').textContent,'b.txt');
+ for(const id of ['lateHash','lateInfo']) {const el=w.document.createElement('div');el.id=id;w.document.body.appendChild(el);}
+ const c=w.hashFile({files:[file('c.txt')]},'lateHash','lateInfo');await new Promise(setImmediate);const resolveC=pending.shift();
+ const d=w.hashFile({files:[file('d.txt')]},'lateHash','lateInfo');await new Promise(setImmediate);pending.shift()('hash-d');await d;resolveC('hash-c');await c;
+ assert.equal(w.document.getElementById('lateHash').textContent,'SHA-256: hash-d');assert.match(w.document.getElementById('lateInfo').textContent,/d.txt/);
+ }finally{dom.window.close();}
+});

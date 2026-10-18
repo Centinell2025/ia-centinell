@@ -2807,45 +2807,43 @@
       if (file) processFileScan(file);
     }
 
+    let scanGeneration = 0;
     async function processFileScan(file) {
+      const generation = ++scanGeneration;
       document.getElementById('scanResult').style.display = 'block';
       document.getElementById('scanFileName').textContent = file.name;
       document.getElementById('scanFileMeta').textContent = `${(file.size/1024).toFixed(2)} KB · ${file.type||'unknown'} · Modified: ${new Date(file.lastModified).toLocaleString()}`;
-      document.getElementById('scanAnalysis').textContent = 'SCANNING...\nComputing SHA-256...\nChecking signatures...\nBehavioral analysis...';
-      const buf = await file.arrayBuffer();
-      const hash = await sha256(buf);
-      document.getElementById('scanHash').textContent = hash;
-      const sig = KNOWN_SIGS[hash];
-      const isMalicious = !!sig;
+      document.getElementById('scanHash').textContent = '';
       const verdict = document.getElementById('scanVerdict');
       const icon = document.getElementById('scanIcon');
-      if (isMalicious) {
-        verdict.textContent = '⚠ THREAT DETECTED';
+      verdict.textContent = 'SCANNING';
+      verdict.className = 'tag tag-amber';
+      icon.textContent = '⏳';
+      document.getElementById('scanAnalysis').textContent = 'Computing SHA-256 and checking the EICAR test signature. No behavioral analysis.';
+      try {
+        const buf = await file.arrayBuffer();
+        if (generation !== scanGeneration) return;
+        const hash = await sha256(buf);
+        if (generation !== scanGeneration) return;
+        document.getElementById('scanHash').textContent = hash;
+        const sig = KNOWN_SIGS[hash];
+        const matched = !!sig;
+        verdict.textContent = matched ? 'EICAR TEST SIGNATURE MATCH' : 'NO TEST SIGNATURE MATCH — NOT A SAFETY VERDICT';
+        verdict.className = matched ? 'tag tag-red' : 'tag tag-green';
+        icon.textContent = matched ? '⚠' : '📄';
+        if (matched) auto_quarantine(file.name, sig, 'HIGH');
+        document.getElementById('scanAnalysis').textContent = (matched ? sig : 'No EICAR test signature match.') +
+          '\nSHA-256: ' + hash + '\nAI unavailable: no provider configured. Signature-only test; no behavioral analysis.';
+        state.shield++;
+        document.getElementById('shieldOps').textContent = state.shield;
+        log(`SCAN: ${file.name} | ${matched?'TEST MATCH':'NO TEST MATCH'}`, matched ? 'warn' : 'op');
+      } catch (error) {
+        if (generation !== scanGeneration) return;
+        verdict.textContent = 'SCAN FAILED — NO VERDICT';
         verdict.className = 'tag tag-red';
-        icon.textContent = '🚨';
-        auto_quarantine(file.name, sig || 'Unknown Malware', 'HIGH');
-      } else {
-        verdict.textContent = 'NO TEST SIGNATURE MATCH — NOT A SAFETY VERDICT';
-        verdict.className = 'tag tag-green';
-        icon.textContent = '✅';
+        icon.textContent = '⚠';
+        document.getElementById('scanAnalysis').textContent = 'Unable to read or hash this file. No analysis was performed.';
       }
-      const key = apiKey();
-      if (key && key !== 'demo-key') {
-        try {
-          const r = await iaAsk(key,
-            'You are IA Centinell Threat Shield. Analyze this scan and provide verdict, classification, risk, and steps.',
-            `File: ${file.name}\nSHA-256: ${hash}\n${isMalicious?'SIGNATURE: '+sig:'No signature'}`);
-          document.getElementById('scanAnalysis').textContent = r;
-        } catch (e) { document.getElementById('scanAnalysis').textContent = (isMalicious ? '⚠ ' + sig :
-            '✅ No matches.') + '\nSHA-256: ' + hash; }
-      } else {
-        document.getElementById('scanAnalysis').textContent = (isMalicious ? '⚠ THREAT DETECTED: ' + sig :
-            '✅ SHA-256: ' + hash + '\n✅ No known signatures.') +
-          '\n\nAI unavailable: no provider configured. Signature-only test; no behavioral analysis.';
-      }
-      state.shield++;
-      document.getElementById('shieldOps').textContent = state.shield;
-      log(`SCAN: ${file.name} | ${isMalicious?'THREAT: '+sig:'CLEAN'}`, isMalicious ? 'err' : 'ok');
     }
 
     async function checkSig() {
@@ -3096,15 +3094,27 @@
       log(`COMPARE: ${match?'MATCH':'MISMATCH'}`, match ? 'ok' : 'err');
     }
 
+    const hashFileGenerations = new Map();
     async function hashFile(input, outId, infoId) {
       const file = input.files[0];
       if (!file) return;
+      const generation = (hashFileGenerations.get(outId) || 0) + 1;
+      hashFileGenerations.set(outId, generation);
+      const isCurrent = () => hashFileGenerations.get(outId) === generation;
       document.getElementById(infoId).textContent = `${file.name} | ${(file.size/1024).toFixed(2)} KB`;
-      const buf = await file.arrayBuffer();
-      const hash = await sha256(buf);
-      document.getElementById(outId).textContent = 'SHA-256: ' + hash;
-      state.c11++;
-      log(`FILE HASH | ${file.name} | ${hash.substr(0,16)}...`, 'ok');
+      document.getElementById(outId).textContent = 'COMPUTING SHA-256...';
+      try {
+        const buf = await file.arrayBuffer();
+        if (!isCurrent()) return;
+        const hash = await sha256(buf);
+        if (!isCurrent()) return;
+        document.getElementById(outId).textContent = 'SHA-256: ' + hash;
+        state.c11++;
+        log(`FILE HASH | ${file.name} | ${hash.substr(0,16)}...`, 'ok');
+      } catch (error) {
+        if (!isCurrent()) return;
+        document.getElementById(outId).textContent = 'HASH FAILED — unable to read or hash this file.';
+      }
     }
 
     async function askAI11() {
