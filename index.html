@@ -2497,14 +2497,15 @@
     let _currentPage = 'bridge';
 
     // --- Helpers ---
-    function log(msg, type = 'op') {
+    function escapeLogText(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function log(msg, type = 'op') {
       state.ops++;
       document.getElementById('topOps').textContent = state.ops;
       document.getElementById('bOps').textContent = state.ops;
       const ts = new Date().toISOString().substr(11, 19);
       const el = document.createElement('div');
       el.innerHTML =
-        `<span style="color:var(--textdd)">[${ts}]</span> <span style="color:${type==='err'?'var(--red)':type==='warn'?'var(--amber)':type==='ok'?'var(--green)':'var(--cyan2)'}">${msg}</span>`;
+        `<span style="color:var(--textdd)">[${ts}]</span> <span style="color:${type==='err'?'var(--red)':type==='warn'?'var(--amber)':type==='ok'?'var(--green)':'var(--cyan2)'}">${escapeLogText(msg)}</span>`;
       document.getElementById('glog').appendChild(el);
       document.getElementById('glog').scrollTop = 9999;
       const bl = document.getElementById('bridgeLog');
