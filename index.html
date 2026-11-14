@@ -1935,7 +1935,7 @@
                 <div class="card-sub">STEP-BY-STEP INSTRUCTIONS</div>
                 <textarea class="inp" id="remediationInput" style="height:45px;">Ransomware on C:\Users\. Ransom note found. System still connected to network.</textarea>
                 <div class="inp-row"><button class="btn btn-green" id="remBtn" onclick="runRemediation()">GET GUIDE</button></div>
-                <div class="output scrollable" id="remOut" style="height:110px;">DESCRIBE THE THREAT.</div>
+                <div class="output scrollable" id="remOut" role="status" aria-live="polite" style="height:110px;">DESCRIBE THE THREAT. GUIDANCE ONLY; NO ACTIONS ARE EXECUTED.</div>
               </div>
             </div>
           </div>
@@ -2515,14 +2515,21 @@
     }
 
     function sha256(str) {
-      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+      // Text is UTF-8; file ArrayBuffers and typed views must retain their original bytes.
+      const bytes = typeof str === 'string' ? new TextEncoder().encode(str) : str;
+      return crypto.subtle.digest('SHA-256', bytes)
         .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
     }
 
     function apiKey() { return document.getElementById('globalKey').value.trim() || 'demo-key'; }
+    function hasAIKey(key) {
+      return typeof key === 'string' && Boolean(key.trim())
+        && !['demo-key', 'demo-key-for-sales'].includes(key.trim());
+    }
 
     // --- AI (Claude) ---
     async function iaAsk(key, system, userMsg) {
+      if (!hasAIKey(key)) throw new Error('Enter a valid AI key. No request was sent.');
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -2544,6 +2551,7 @@
     }
 
     async function iaChat(key, system, messages) {
+      if (!hasAIKey(key)) throw new Error('Enter a valid AI key. No request was sent.');
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -2717,9 +2725,7 @@
 
     // --- THREAT SHIELD ---
     const KNOWN_SIGS = {
-      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'EICAR Test File (Harmless)',
       'a3f5d2c9b1e8f4a7d6c3b2e1f9a8d7c6b5e4f3a2d1c0b9e8f7a6d5c4b3e2f1': 'Trojan.GenericKD.71234',
-      'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592': 'Ransomware.WannaCry.variant',
       '2c624232cdd221771294dfbb310acbc5864efebcb3fa0e2e2e5e6b7c2c4a1e3': 'Backdoor.Generic.malware',
     };
 
@@ -2836,6 +2842,40 @@
       log(`DELETED FROM QUARANTINE: ${name}`, 'ok');
     }
 
+    // This control requests guidance only; it does not execute remediation.
+    async function runRemediation() {
+      const btn = document.getElementById('remBtn');
+      const out = document.getElementById('remOut');
+      if (btn.disabled) return;
+      const description = document.getElementById('remediationInput').value.trim();
+      if (!description) { out.textContent = 'Describe the threat before requesting a guide.'; return; }
+      const key = apiKey();
+      if (!hasAIKey(key)) {
+        out.textContent = 'Enter a valid AI key to request a remediation guide. No request was sent.';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'REQUESTING GUIDE...';
+      out.textContent = 'Requesting AI guidance. No remediation actions are executed by this control.';
+      try {
+        const response = await iaAsk(key,
+          'You are IA Centinell. Provide a defensive incident-response guide for human review. '
+          + 'Separate observations from assumptions, prioritize preserving evidence, and identify '
+          + 'steps that require an authorized responder. Do not claim that you scanned, isolated, '
+          + 'deleted, recovered, or verified anything. This interface cannot execute remediation.',
+          description);
+        if (!response.trim()) throw new Error('The AI provider returned no guide.');
+        out.textContent = 'GUIDANCE ONLY - review before any action.\n\n' + response;
+        state.queries++;
+        log('REMEDIATION GUIDE GENERATED - HUMAN REVIEW REQUIRED', 'op');
+      } catch (error) {
+        out.textContent = 'Unable to generate a guide: ' + error.message + '\nNo remediation actions were executed.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'GET GUIDE';
+      }
+    }
+
     // --- File Scanner ---
     async function scanFileInput(input) {
       const file = input.files[0];
@@ -2873,7 +2913,7 @@
         icon.textContent = '✅';
       }
       const key = apiKey();
-      if (key && key !== 'demo-key') {
+      if (hasAIKey(key)) {
         try {
           const r = await iaAsk(key,
             'You are IA Centinell Threat Shield. Analyze this scan and provide verdict, classification, risk, and steps.',
@@ -2903,7 +2943,7 @@
 
     async function runBehavior() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key to use the analyzer.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key to use the analyzer.'); return; }
       const btn = document.getElementById('behaviorBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -2928,7 +2968,7 @@
 
     async function runReputation() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('reputBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -2988,7 +3028,7 @@
 
     async function runNetAnalysis() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('netBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3006,7 +3046,7 @@
 
     async function runFirewall() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('fwBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3072,7 +3112,7 @@
 
     async function runFileBehavior() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('fileBehaviorBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3092,7 +3132,7 @@
 
     async function runSysInt() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('sysIntBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3149,7 +3189,7 @@
 
     async function askAI11() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const q = document.getElementById('ai11q').value.trim() || `Analyze the hash: ${document.getElementById('h11hash').textContent}`;
       const btn = document.getElementById('ai11btn');
       btn.disabled = true;
@@ -3217,7 +3257,7 @@
 
     async function runForensic() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('forensicBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3238,7 +3278,7 @@
     // --- IA-CORE-1-3 ---
     async function runEthics() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('ethicsBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3258,7 +3298,7 @@
 
     async function runBias() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('biasBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3280,7 +3320,7 @@
 
     async function runCompliance() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const fws = [];
       if (document.getElementById('chk_nist').checked) fws.push('NIST CSF 2.0');
       if (document.getElementById('chk_iso').checked) fws.push('ISO/IEC 42001');
@@ -3401,7 +3441,7 @@
 
     async function runThreat() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('threatBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3435,7 +3475,7 @@
 
     async function generatePlaybook() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       if (selectedMitre.size === 0) { document.getElementById('mitreOut').textContent =
         'SELECT TECHNIQUES FIRST.'; return; }
       const ttps = [...selectedMitre].map(id => mitreData.find(m => m.id === id)).filter(Boolean);
@@ -3452,7 +3492,7 @@
 
     async function runIR() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('irBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3471,7 +3511,7 @@
     // --- AI ANALYST ---
     async function sendMain() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const input = document.getElementById('mainInput').value.trim();
       if (!input) return;
       addMsg('user', input);
@@ -3516,7 +3556,7 @@
     // --- ALGO LAB ---
     async function runAlgo() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('algoBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span> COMPUTING...';
@@ -3544,7 +3584,7 @@
 
     async function runDebate() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('debateBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';
@@ -3562,7 +3602,7 @@
 
     async function runOptimize() {
       const key = apiKey();
-      if (!key || key === 'demo-key') { alert('Enter a valid AI key.'); return; }
+      if (!hasAIKey(key)) { alert('Enter a valid AI key.'); return; }
       const btn = document.getElementById('optBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span>';

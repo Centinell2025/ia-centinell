@@ -25,10 +25,9 @@ const db = {
   baseline: [],
   hitl: [],
   logs: [],
-  threatSignatures: [
-    { hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', name: 'EICAR Test File' },
-    { hash: 'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592', name: 'Ransomware.WannaCry' }
-  ]
+  // Empty bytes and a common plain-text sentence are not malware signatures.
+  // Keep this catalogue empty until independently verified entries are supplied.
+  threatSignatures: []
 };
 
 // --- Utilidades ---
