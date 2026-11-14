@@ -1,0 +1,10 @@
+{
+  "name": "ia-centinell-review-checks",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
